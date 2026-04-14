@@ -1,0 +1,253 @@
+type PlayerSlice = {
+  loading: boolean;
+  playerReady: boolean;
+  playerLoading: boolean;
+  midiLoaded: boolean;
+  midiLoading: boolean;
+  playerError: string | null;
+  playerExpanded: boolean;
+  bpm: number;
+  bpmMin: number;
+  bpmMax: number;
+  timeSignature: string;
+  baseBpm: number;
+  metronomeEnabled: boolean;
+  metronomeVolume: number;
+  audioVolume: number;
+  loopEnabled: boolean;
+  loopStartMeasure: number | null;
+  loopEndMeasure: number | null;
+};
+
+type Props = {
+  state: PlayerSlice;
+  mobileControlsOnly?: boolean;
+  onPlay: () => void;
+  onPause: () => void;
+  onStop: () => void;
+  onToggleExpanded: () => void;
+  onTempo: (v: number) => void;
+  onAudioVolume: (v: number) => void;
+  onToggleMetronome: () => void;
+  onMetronomeVolume: (v: number) => void;
+  onToggleLoop: () => void;
+  onLoopStart: (v: number | null) => void;
+  onLoopEnd: (v: number | null) => void;
+};
+
+export function StudyPlayerPanel({
+  state,
+  mobileControlsOnly = false,
+  onPlay,
+  onPause,
+  onStop,
+  onToggleExpanded,
+  onTempo,
+  onAudioVolume,
+  onToggleMetronome,
+  onMetronomeVolume,
+  onToggleLoop,
+  onLoopStart,
+  onLoopEnd,
+}: Props) {
+  const disabledTransport = state.loading || state.playerLoading;
+
+  if (!state.playerReady) {
+    return (
+      <aside
+        className={`bg-white border border-gray-300 rounded-2xl shadow-sm flex flex-col overflow-hidden sticky top-3 z-3 h-fit gap-0 transition-all ${state.playerExpanded ? 'max-h-96' : 'max-h-14 overflow-hidden'}`}
+      >
+        {!mobileControlsOnly ? (
+          <div className="flex items-center justify-between flex-nowrap gap-2 px-3 py-2 min-h-10 bg-gray-100 font-semibold text-xs flex-shrink-0">
+            <span>Player</span>
+          </div>
+        ) : null}
+        <div className="px-4 py-4 text-center">
+          <p className="text-sm text-gray-600">
+            {state.playerError ? 'Player indisponível.' : 'Preparando o player...'}
+          </p>
+        </div>
+      </aside>
+    );
+  }
+
+  return (
+    <aside
+      className={`bg-white border border-gray-300 rounded-2xl shadow-sm flex flex-col overflow-hidden sticky top-3 z-3 h-fit gap-0 transition-all ${state.playerExpanded ? 'max-h-96' : 'max-h-14 overflow-hidden'}`}
+    >
+      {!mobileControlsOnly ? (
+        <div className="flex items-center justify-between flex-wrap gap-2 px-3 py-2 min-h-10 bg-gray-100 font-semibold text-xs flex-shrink-0">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="material-icons text-xl text-primary" aria-hidden>
+              play_circle
+            </span>
+            <span>Player</span>
+          </div>
+          <div className="hidden md:flex items-center gap-1">
+            <button type="button" className={`inline-flex items-center justify-center w-9 h-9 rounded-full bg-transparent cursor-pointer ${disabledTransport ? 'opacity-40 cursor-not-allowed' : 'hover:bg-gray-200'} ${state.playerExpanded ? 'text-primary' : ''}`} onClick={onPlay} disabled={disabledTransport} aria-label="Play">
+              <span className="material-icons">play_arrow</span>
+            </button>
+            <button type="button" className={`inline-flex items-center justify-center w-9 h-9 rounded-full bg-transparent cursor-pointer ${disabledTransport ? 'opacity-40 cursor-not-allowed' : 'hover:bg-gray-200'}`} onClick={onPause} disabled={disabledTransport} aria-label="Pausar">
+              <span className="material-icons">pause</span>
+            </button>
+            <button type="button" className={`inline-flex items-center justify-center w-9 h-9 rounded-full bg-transparent cursor-pointer ${disabledTransport ? 'opacity-40 cursor-not-allowed' : 'hover:bg-gray-200'}`} onClick={onStop} disabled={disabledTransport} aria-label="Parar">
+              <span className="material-icons">stop</span>
+            </button>
+          </div>
+          <div className="hidden md:flex items-center gap-2 flex-0 min-w-24 max-w-32">
+            <span className="material-icons text-base text-gray-600" aria-hidden>
+              volume_up
+            </span>
+            <input
+              type="range"
+              min={0}
+              max={1}
+              step={0.05}
+              value={state.audioVolume}
+              onChange={(e) => onAudioVolume(Number(e.target.value))}
+              disabled={state.playerLoading}
+              className="flex-1 min-w-0"
+            />
+          </div>
+          <button type="button" className="border border-gray-300 bg-white cursor-pointer text-xs px-2.5 py-1 rounded-lg hover:bg-gray-50" onClick={onToggleExpanded}>
+            <span className="material-icons text-lg">
+              {state.playerExpanded ? 'expand_less' : 'expand_more'}
+            </span>
+            <span className="hidden md:inline">{state.playerExpanded ? 'Recolher' : 'Expandir'}</span>
+          </button>
+        </div>
+      ) : null}
+
+      <div className="flex flex-col gap-3 px-3 py-3">
+        {state.playerLoading || !state.midiLoaded ? (
+          <div className="px-3 py-4 text-center">
+            <p className="text-xs text-gray-600">
+              {state.playerLoading
+                ? 'Preparando o player...'
+                : state.midiLoading
+                  ? 'Carregando áudio (MIDI)...'
+                  : 'Áudio será carregado ao tocar em Play'}
+            </p>
+          </div>
+        ) : null}
+
+        {!mobileControlsOnly ? (
+          <div className="flex items-center gap-2">
+            <button type="button" className={`inline-flex items-center justify-center w-9 h-9 rounded-full cursor-pointer ${disabledTransport ? 'opacity-40 cursor-not-allowed' : ''} text-primary hover:bg-gray-100`} onClick={onPlay} disabled={disabledTransport}>
+              <span className="material-icons">play_arrow</span>
+            </button>
+            <button type="button" className={`inline-flex items-center justify-center w-9 h-9 rounded-full cursor-pointer ${disabledTransport ? 'opacity-40 cursor-not-allowed' : ''} hover:bg-gray-100`} onClick={onPause} disabled={disabledTransport}>
+              <span className="material-icons">pause</span>
+            </button>
+            <button type="button" className={`inline-flex items-center justify-center w-9 h-9 rounded-full cursor-pointer ${disabledTransport ? 'opacity-40 cursor-not-allowed' : ''} hover:bg-gray-100`} onClick={onStop} disabled={disabledTransport}>
+              <span className="material-icons">stop</span>
+            </button>
+          </div>
+        ) : null}
+
+        <div>
+          <span className="hidden md:block text-xs font-medium text-gray-600 mb-1.5">Andamento</span>
+          <div className="flex items-center gap-2">
+            <input
+              type="range"
+              min={state.bpmMin}
+              max={state.bpmMax}
+              step={1}
+              value={state.bpm}
+              onChange={(e) => onTempo(Number(e.target.value))}
+              disabled={state.playerLoading}
+              className="flex-1 min-w-0"
+            />
+            <span className="hidden md:inline text-xs font-medium text-gray-600 min-w-fit">{Math.round(state.bpm)} BPM</span>
+          </div>
+        </div>
+
+        <div>
+          <span className="hidden md:block text-xs font-medium text-gray-600 mb-1.5">Volume</span>
+          <div className="flex items-center gap-2">
+            <input
+              type="range"
+              min={0}
+              max={1}
+              step={0.05}
+              value={state.audioVolume}
+              onChange={(e) => onAudioVolume(Number(e.target.value))}
+              disabled={state.playerLoading}
+              className="flex-1 min-w-0"
+            />
+            <span className="hidden md:inline text-xs font-medium text-gray-600 min-w-fit">{Math.round(state.audioVolume * 100)}%</span>
+          </div>
+        </div>
+
+        <div>
+          <span className="hidden md:block text-xs font-medium text-gray-600 mb-1.5">Metrônomo</span>
+          <div className="flex flex-col gap-2">
+            <button
+              type="button"
+              className="px-3 py-2 rounded-lg border border-gray-300 bg-white font-medium text-xs cursor-pointer hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              onClick={onToggleMetronome}
+              disabled={disabledTransport}
+            >
+              {state.metronomeEnabled ? 'Metrônomo ligado' : 'Metrônomo desligado'}
+            </button>
+            <span className="hidden md:inline text-xs text-gray-600">
+              {state.timeSignature} · Base {Math.round(state.baseBpm)} BPM
+            </span>
+            <div className="flex items-center gap-2">
+              <span className="hidden md:inline text-xs font-medium text-gray-600">Volume</span>
+              <input
+                type="range"
+                min={0}
+                max={1}
+                step={0.05}
+                value={state.metronomeVolume}
+                onChange={(e) => onMetronomeVolume(Number(e.target.value))}
+                disabled={!state.metronomeEnabled || state.playerLoading}
+                className="flex-1 min-w-0"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <span className="hidden md:block text-xs font-medium text-gray-600 mb-1.5">Loop</span>
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-col md:flex-row gap-2">
+              <label className="flex flex-col gap-1">
+                <span className="text-xs font-medium text-gray-600">Loop In (compasso)</span>
+                <input
+                  type="number"
+                  value={state.loopStartMeasure ?? ''}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    onLoopStart(v === '' ? null : Number(v));
+                  }}
+                  className="px-2 py-1.5 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary text-xs"
+                />
+              </label>
+              <label className="flex flex-col gap-1">
+                <span className="text-xs font-medium text-gray-600">Loop Out (compasso)</span>
+                <input
+                  type="number"
+                  value={state.loopEndMeasure ?? ''}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    onLoopEnd(v === '' ? null : Number(v));
+                  }}
+                  className="px-2 py-1.5 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary text-xs"
+                />
+              </label>
+              <button type="button" className="px-3 py-2 rounded-lg bg-primary text-white font-medium text-xs cursor-pointer hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed" onClick={onToggleLoop} disabled={state.playerLoading}>
+                {state.loopEnabled ? 'Desativar Loop' : 'Ativar Loop'}
+              </button>
+            </div>
+            <div className="flex gap-4 text-xs text-gray-600">
+              <span>In: {state.loopStartMeasure ?? '-'}</span>
+              <span>Out: {state.loopEndMeasure ?? '-'}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  );
+}

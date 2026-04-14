@@ -1,0 +1,439 @@
+/* SharedTable.module.scss */
+
+.container {
+  background-color: var(--card);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background-color: var(--card);
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.headerTitle {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.headerTitle h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--card-foreground);
+  margin: 0;
+}
+
+.headerTitle p {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+  margin: 0;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.dropdownWrapper {
+  position: relative;
+}
+
+.columnsDropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.5rem);
+  min-width: 15rem;
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  padding: 0.75rem;
+  z-index: 20;
+}
+
+.columnOption {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  color: var(--card-foreground);
+  transition: background-color 0.2s ease;
+}
+
+.columnOption:hover {
+  background-color: var(--card-secondary);
+}
+
+.columnOption input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--primary);
+}
+
+.searchBar {
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background-color: var(--card);
+}
+
+.searchContainer {
+  position: relative;
+  width: 100%;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted-foreground);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+  border: 1px solid var(--border);
+  border-radius: 0.375rem;
+  background-color: var(--card-secondary);
+  color: var(--card-foreground);
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.searchInput::placeholder {
+  color: var(--muted-foreground);
+}
+
+.searchInput:hover {
+  border-color: var(--muted);
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.thead {
+  background-color: var(--card-secondary);
+  border-bottom: 2px solid var(--border);
+}
+
+.th {
+  padding: 0.75rem 1.5rem;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--card-foreground);
+  border-right: 1px solid var(--border);
+  background-color: var(--card-secondary);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.th:last-child {
+  border-right: none;
+}
+
+.THCell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sortable {
+  cursor: pointer;
+}
+
+.sortable:hover {
+  opacity: 0.8;
+}
+
+.sortIcon {
+  display: flex;
+  align-items: center;
+  font-size: 0.75rem;
+  opacity: 0.6;
+  margin-left: 0.25rem;
+}
+
+.tbody {
+  background-color: var(--card);
+}
+
+.tr {
+  border-bottom: 1px solid var(--border);
+  transition: all 0.2s ease;
+}
+
+.tr:nth-child(odd) {
+  background-color: var(--card);
+}
+
+.tr:nth-child(even) {
+  background-color: var(--card-secondary);
+}
+
+.tr:hover {
+  background-color: var(--border);
+}
+
+.tr:last-child {
+  border-bottom: none;
+}
+
+.td {
+  padding: 1rem 1.5rem;
+  font-size: 0.875rem;
+  color: var(--card-foreground);
+  border-right: 1px solid var(--border);
+  transition: color 0.2s ease;
+}
+
+.td:last-child {
+  border-right: none;
+}
+
+.tdAlign-center {
+  text-align: center;
+}
+
+.tdAlign-right {
+  text-align: right;
+}
+
+.tdEmpty {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: var(--muted-foreground);
+}
+
+.tdActions {
+  text-align: right;
+}
+
+.actionButtons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  border-radius: 50%;
+  border: none;
+  background-color: transparent;
+  color: var(--primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 0;
+}
+
+.actionBtn:hover:not(:disabled) {
+  background-color: var(--border);
+  transform: scale(1.1);
+}
+
+.actionBtn:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.actionBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.actionBtn.primary {
+  color: var(--primary);
+}
+
+.actionBtn.secondary {
+  color: var(--muted-foreground);
+}
+
+.actionBtn.secondary:hover:not(:disabled) {
+  color: var(--card-foreground);
+}
+
+.actionBtn.warn {
+  color: #dc2626;
+}
+
+.actionBtn.warn:hover:not(:disabled) {
+  background-color: rgba(220, 38, 38, 0.1);
+  color: #b93c3c;
+}
+
+.actionBtn.success {
+  color: #16a34a;
+}
+
+.actionBtn.success:hover:not(:disabled) {
+  background-color: rgba(22, 163, 74, 0.1);
+  color: #15803d;
+}
+
+.footer {
+  padding: 0.75rem 1.5rem;
+  border-top: 1px solid var(--border);
+  background-color: var(--card-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.paginationInfo {
+  font-size: 0.875rem;
+  color: var(--card-foreground);
+}
+
+.paginationControls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.paginationBtn {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.875rem;
+  border: 1px solid var(--border);
+  border-radius: 0.375rem;
+  background-color: var(--card);
+  color: var(--card-foreground);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.paginationBtn:hover:not(:disabled) {
+  background-color: var(--border);
+  border-color: var(--primary);
+}
+
+.paginationBtn:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.paginationBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pageInfo {
+  font-size: 0.875rem;
+  color: var(--card-foreground);
+  padding: 0 0.5rem;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  gap: 1rem;
+}
+
+.spinner {
+  width: 2rem;
+  height: 2rem;
+  border: 2px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loadingText {
+  font-size: 0.875rem;
+  color: var(--card-foreground);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 1rem;
+  }
+
+  .headerContent {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .headerActions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .searchBar {
+    padding: 0.5rem 1rem;
+  }
+
+  .th {
+    padding: 0.5rem;
+    font-size: 0.7rem;
+  }
+
+  .td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .footer {
+    padding: 0.5rem 1rem;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .paginationInfo {
+    order: 3;
+    width: 100%;
+  }
+
+  .paginationControls {
+    width: 100%;
+    justify-content: center;
+  }
+}

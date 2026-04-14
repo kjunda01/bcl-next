@@ -1,0 +1,114 @@
+{
+  "students": [
+    {
+      "id": 2,
+      "firstName": "Maria",
+      "lastName": "Santos",
+      "email": "maria.santos@email.com",
+      "phone": "(35) 99876-5432",
+      "birthDate": "2004-07-22",
+      "enrollmentDate": "2023-03-15",
+      "status": "active"
+    },
+    {
+      "id": 3,
+      "firstName": "Pedro",
+      "lastName": "Oliveira",
+      "email": "pedro.oliveira@email.com",
+      "phone": "(35) 98765-1234",
+      "birthDate": "2006-11-08",
+      "enrollmentDate": "2023-01-20",
+      "status": "inactive"
+    },
+    {
+      "firstName": "Pedro",
+      "lastName": "Santos",
+      "email": "pedro@santos.com",
+      "phone": "35987654321",
+      "birthDate": "1988-02-10",
+      "enrollmentDate": "2026-04-09",
+      "status": "active",
+      "id": 4
+    },
+    {
+      "firstName": "antonio",
+      "lastName": "armando",
+      "email": "t@b.com",
+      "phone": "35999999999",
+      "birthDate": "2000-10-10",
+      "enrollmentDate": "2026-04-09",
+      "status": "active",
+      "id": 5
+    },
+    {
+      "firstName": "antonio",
+      "lastName": "jao",
+      "email": "t@b.com",
+      "phone": "35999999999",
+      "birthDate": "2000-10-10",
+      "enrollmentDate": "2026-04-09",
+      "status": "active",
+      "id": 6
+    },
+    {
+      "firstName": "antonio",
+      "lastName": "jao",
+      "email": "t@b.com",
+      "phone": "35999999999",
+      "birthDate": "2000-10-10",
+      "enrollmentDate": "2026-04-09",
+      "status": "active",
+      "id": 7
+    },
+    {
+      "firstName": "antonio",
+      "lastName": "jao",
+      "email": "t@b.com",
+      "phone": "35999999999",
+      "birthDate": "2000-10-10",
+      "enrollmentDate": "2026-04-09",
+      "status": "active",
+      "id": 8
+    },
+    {
+      "firstName": "antonio",
+      "lastName": "jao",
+      "email": "t@b.com",
+      "phone": "35999999999",
+      "birthDate": "2000-10-10",
+      "enrollmentDate": "2026-04-09",
+      "status": "active",
+      "id": 9
+    },
+    {
+      "firstName": "antonio",
+      "lastName": "jao",
+      "email": "t@b.com",
+      "phone": "35999999999",
+      "birthDate": "2000-10-10",
+      "enrollmentDate": "2026-04-09",
+      "status": "active",
+      "id": 10
+    },
+    {
+      "firstName": "antonio",
+      "lastName": "jao",
+      "email": "t@b.com",
+      "phone": "35999999999",
+      "birthDate": "2000-10-10",
+      "enrollmentDate": "2026-04-09",
+      "status": "active",
+      "id": 11
+    },
+    {
+      "firstName": "juca",
+      "lastName": "bala",
+      "email": "t@b.com",
+      "phone": "35999999999",
+      "birthDate": "2000-10-10",
+      "enrollmentDate": "2026-04-09",
+      "status": "active",
+      "id": 12
+    }
+  ]
+}
