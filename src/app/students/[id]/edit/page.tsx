@@ -5,6 +5,7 @@ import { EntityFormPage } from '@/components/entity/EntityFormPage';
 import {
   getInitialStudentFormData,
   getStudentFormFields,
+  renderStudentUnderageNotice,
   toStudentFormData,
   type Student,
   type StudentFormData,
@@ -24,6 +25,7 @@ export default function StudentEditPage({ params }: Readonly<{ params: Promise<{
       fields={getStudentFormFields('edit')}
       saveLabel="Salvar"
       savingLabel="Salvando..."
+      renderNotice={renderStudentUnderageNotice}
       notFoundMessage="Aluno não encontrado."
       mapLoadedToForm={toStudentFormData}
       getSuccessPath={(student) => `/students/${student.id}`}

@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { apiFetch } from '@/lib/api';
@@ -23,6 +24,7 @@ export interface EntityFormField<TForm extends object> {
   accept?: string;
   helpText?: string;
   colSpan?: 1 | 2;
+  showWhen?: (formData: TForm) => boolean;
   validate?: (value: TForm[keyof TForm], formData: TForm) => string | null;
 }
 
@@ -40,6 +42,7 @@ interface EntityFormPageProps<TForm extends object, TEntity = TForm> {
   getSuccessPath: (entity: TEntity) => string;
   mapLoadedToForm?: (entity: TEntity) => TForm;
   mapFormToPayload?: (formData: TForm) => unknown;
+  renderNotice?: (formData: TForm) => React.ReactNode;
   validate?: (formData: TForm) => Record<string, string>;
 }
 
@@ -87,6 +90,28 @@ async function readFileAsDataUrl(file: File): Promise<string> {
     reader.onerror = () => reject(new Error('Falha ao ler arquivo'));
     reader.readAsDataURL(file);
   });
+}
+
+function isFieldVisible<TForm extends object>(field: EntityFormField<TForm>, formData: TForm): boolean {
+  return field.showWhen ? field.showWhen(formData) : true;
+}
+
+function formatPhoneNumber(value: string): string {
+  const digits = value.replaceAll(/\D/g, '').slice(0, 11);
+
+  if (digits.length <= 2) {
+    return digits ? `(${digits}` : '';
+  }
+
+  if (digits.length <= 6) {
+    return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+  }
+
+  if (digits.length <= 10) {
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+  }
+
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
 }
 
 interface FieldRendererProps<TForm extends object> {
@@ -154,10 +179,13 @@ function FieldRenderer<TForm extends object>({
 
         {previewSrc ? (
           <div className="flex items-center gap-4 rounded-lg border border-border bg-background px-4 py-3">
-            <img
+            <Image
               src={previewSrc}
               alt="Pré-visualização da foto de perfil"
+              width={80}
+              height={80}
               className="h-20 w-20 rounded-full object-cover border border-border"
+              unoptimized
             />
             <button
               type="button"
@@ -206,6 +234,7 @@ export function EntityFormPage<TForm extends object, TEntity = TForm>({
   getSuccessPath,
   mapLoadedToForm,
   mapFormToPayload,
+  renderNotice,
   validate,
 }: Readonly<EntityFormPageProps<TForm, TEntity>>) {
   const router = useRouter();
@@ -215,6 +244,7 @@ export function EntityFormPage<TForm extends object, TEntity = TForm>({
   const [notFound, setNotFound] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const visibleFields = fields.filter((field) => isFieldVisible(field, formData));
 
   useEffect(() => {
     if (mode !== 'edit' || !id) {
@@ -238,7 +268,7 @@ export function EntityFormPage<TForm extends object, TEntity = TForm>({
   const validateForm = (): boolean => {
     const fieldErrors: Record<string, string> = {};
 
-    fields.forEach((field) => {
+    visibleFields.forEach((field) => {
       const value = formData[field.name];
 
       const isMissingRequiredValue = typeof value === 'string'
@@ -266,7 +296,10 @@ export function EntityFormPage<TForm extends object, TEntity = TForm>({
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    const { name, value } = event.target;
+    const name = event.target.name as keyof TForm & string;
+    const rawValue = event.target.value;
+    const field = fields.find((candidate) => candidate.name === name);
+    const value = field?.type === 'tel' ? formatPhoneNumber(rawValue) : rawValue;
 
     setFieldValue(setFormData, name, value as TForm[keyof TForm]);
     clearFieldError(errors, setErrors, name);
@@ -380,8 +413,10 @@ export function EntityFormPage<TForm extends object, TEntity = TForm>({
 
       <div className="bg-card border border-border rounded-lg shadow-sm overflow-hidden p-6">
         <form onSubmit={(event) => { event.preventDefault(); handleSave(); }} className="space-y-6">
+          {renderNotice ? renderNotice(formData) : null}
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {fields.map((field) => {
+            {visibleFields.map((field) => {
               const value = formData[field.name];
               const hasError = Boolean(errors[field.name]);
 

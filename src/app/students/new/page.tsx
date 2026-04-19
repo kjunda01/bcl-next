@@ -4,6 +4,7 @@ import { EntityFormPage } from '@/components/entity/EntityFormPage';
 import {
   getInitialStudentFormData,
   getStudentFormFields,
+  renderStudentUnderageNotice,
   toStudentCreatePayload,
   type Student,
   type StudentFormData,
@@ -20,6 +21,7 @@ export default function StudentAddPage() {
       fields={getStudentFormFields('create')}
       saveLabel="Criar Aluno"
       savingLabel="Salvando..."
+      renderNotice={renderStudentUnderageNotice}
       mapFormToPayload={toStudentCreatePayload}
       getSuccessPath={(student) => `/students/${student.id}`}
     />
