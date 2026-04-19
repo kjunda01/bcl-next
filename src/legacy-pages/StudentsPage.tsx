@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { SharedTable } from '../components/SharedTable';
-import type { ColumnConfig, TableAction } from '../components/SharedTable';
+import { SharedTable } from '../components/sharedTable/SharedTable';
+import type { ColumnConfig, TableAction } from '../components/sharedTable/SharedTable';
 
 interface Student {
   id: string;

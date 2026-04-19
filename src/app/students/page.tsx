@@ -3,9 +3,10 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useEntityCRUD } from '@/hooks/useCRUD';
-import { SharedTable } from '@/components/SharedTable';
+import { SharedTable } from '@/components/sharedTable/SharedTable';
 import { CRUDModal } from '@/components/CRUDModal';
-import type { ColumnConfig, TableAction } from '@/components/SharedTable';
+import type { ColumnConfig, TableAction } from '@/components/sharedTable/SharedTable';
+import { renderStudentAvatar } from '@/app/students/studentEntityConfig';
 
 interface Student {
   id: string | number;
@@ -15,6 +16,7 @@ interface Student {
   phone: string;
   birthDate: string;
   enrollmentDate: string;
+  profileImageUrl?: string;
   status: 'active' | 'inactive';
 }
 
@@ -33,7 +35,12 @@ export default function StudentsPage() {
       sortKey: 'firstName',
       label: 'Nome',
       sortable: true,
-      render: (_, item) => `${item.firstName} ${item.lastName}`
+      render: (_, item) => (
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 overflow-hidden rounded-full">{renderStudentAvatar(item)}</div>
+          <span>{item.firstName} {item.lastName}</span>
+        </div>
+      )
     },
 
     {
@@ -120,7 +127,10 @@ export default function StudentsPage() {
         <div className="text-center py-8">
           <p className="text-red-600">{crud.error}</p>
           <button
-            onClick={() => window.location.reload()}
+            onClick={() => {
+              crud.setError(null);
+              void crud.loadItems();
+            }}
             className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
           >
             Tentar novamente

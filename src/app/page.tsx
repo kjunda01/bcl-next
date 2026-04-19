@@ -2,7 +2,6 @@
 import { useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useTheme } from '@/contexts/ThemeContext';
 
 const QUICK_ACTIONS = [
   { icon: 'menu_book', label: 'Partituras', to: '/study', description: 'Estudar e praticar' },
