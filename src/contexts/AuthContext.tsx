@@ -6,62 +6,64 @@ import {
   useContext,
   useMemo,
   useState,
+  useSyncExternalStore,
   type ReactNode,
 } from 'react';
+import { demoUserByRole, findDemoUser } from '@/core/auth/demoUsers';
+import {
+  AUTHENTICATED_ROLES,
+  PUBLIC_ROLES,
+  type AccessRoles,
+  type AuthenticatedRole,
+} from '@/core/auth/roles';
+import type { AppUser } from '@/domains/users/types';
 
 const AUTH_USER_KEY = 'app.auth.user';
 const AUTH_KEEP_LOGGED_KEY = 'app.auth.keepLoggedIn';
 
-export type ProfileType = 'aluno' | 'musico' | 'maestro' | 'admin' | 'public';
-
-export interface User {
-  id: string;
-  name: string;
-  firstName: string;
-  lastName?: string;
-  email: string;
-  phone?: string;
-  address?: string;
-  birthDate?: string;
-  pictureUrl?: string;
-  profileType?: ProfileType;
-}
-
-const MOCK_USER: User = {
-  id: 'mock-1',
-  name: 'João das Couves',
-  firstName: 'João',
-  lastName: 'das Couves',
-  email: 'joao.das.couves@example.com',
-  phone: '(35) 98765-4321',
-  address: 'Rua das Flores, 123, Luminárias - MG',
-  birthDate: '1990-05-15',
-  profileType: 'musico',
-};
+export type SessionUser = AppUser;
 
 type AuthContextValue = {
-  user: User | null;
+  user: SessionUser | null;
+  isHydrated: boolean;
   isLoggedIn: boolean;
+  roles: AccessRoles;
   displayName: string | null;
-  login: (user: string, keepLoggedIn: boolean) => Promise<void>;
-  loginWithGoogle: (keepLoggedIn: boolean) => void;
+  login: (email: string, password: string, keepLoggedIn: boolean) => Promise<void>;
+  loginAs: (role: AuthenticatedRole, keepLoggedIn: boolean) => Promise<void>;
   logout: () => Promise<void>;
-  updateProfile: (patch: Partial<User>) => void;
+  updateProfile: (patch: Partial<SessionUser>) => void;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+const subscribeToHydration = () => () => undefined;
 
-function restoreUser(): User | null {
-  if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
-    return null;
+function persist(user: SessionUser | null, keepLoggedIn: boolean) {
+  if (typeof window === 'undefined') return;
+  if (user && keepLoggedIn) {
+    localStorage.setItem(AUTH_KEEP_LOGGED_KEY, 'true');
+    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
+    return;
   }
+  localStorage.removeItem(AUTH_KEEP_LOGGED_KEY);
+  localStorage.removeItem(AUTH_USER_KEY);
+}
 
+function restoreUser(): SessionUser | null {
+  if (typeof window === 'undefined') return null;
   const keep = localStorage.getItem(AUTH_KEEP_LOGGED_KEY) === 'true';
   if (!keep) return null;
   const stored = localStorage.getItem(AUTH_USER_KEY);
   if (!stored) return null;
   try {
-    return JSON.parse(stored) as User;
+    const parsed = JSON.parse(stored) as Partial<SessionUser>;
+    const roles = Array.isArray(parsed.roles)
+      ? parsed.roles.filter((role): role is AuthenticatedRole =>
+          (AUTHENTICATED_ROLES as readonly string[]).includes(role),
+        )
+      : [];
+    if (roles.length === 0) return null;
+    return { ...parsed, roles } as SessionUser;
   } catch {
     localStorage.removeItem(AUTH_USER_KEY);
     return null;
@@ -69,33 +71,37 @@ function restoreUser(): User | null {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(() => restoreUser());
+  const [user, setUser] = useState<SessionUser | null>(() => restoreUser());
+  const isHydrated = useSyncExternalStore(
+    subscribeToHydration,
+    () => true,
+    () => false,
+  );
 
-  const login = useCallback(async (user: string, keepLoggedIn: boolean) => {
-    setUser({ ...MOCK_USER });
-    if (keepLoggedIn) {
-      localStorage.setItem(AUTH_KEEP_LOGGED_KEY, 'true');
-      localStorage.setItem(AUTH_USER_KEY, JSON.stringify(MOCK_USER));
-    } else {
-      localStorage.removeItem(AUTH_KEEP_LOGGED_KEY);
-      localStorage.removeItem(AUTH_USER_KEY);
+  const login = useCallback(async (email: string, password: string, keepLoggedIn: boolean) => {
+    const found = findDemoUser(email, password);
+    if (!found) {
+      throw new Error('E-mail ou senha inválidos.');
     }
+    setUser(found);
+    persist(found, keepLoggedIn);
   }, []);
 
-  const loginWithGoogle = useCallback(
-    (keepLoggedIn: boolean) => login('google', keepLoggedIn),
-    [login],
-  );
+  const loginAs = useCallback(async (role: AuthenticatedRole, keepLoggedIn: boolean) => {
+    const found = demoUserByRole(role);
+    setUser(found);
+    persist(found, keepLoggedIn);
+  }, []);
 
   const logout = useCallback(async () => {
     setUser(null);
-    localStorage.removeItem(AUTH_KEEP_LOGGED_KEY);
-    localStorage.removeItem(AUTH_USER_KEY);
+    persist(null, false);
   }, []);
 
-  const updateProfile = useCallback((patch: Partial<User>) => {
+  const updateProfile = useCallback((patch: Partial<SessionUser>) => {
     setUser((prev) => {
-      const next = { ...(prev ?? MOCK_USER), ...patch };
+      if (!prev) return prev;
+      const next = { ...prev, ...patch, updatedAt: new Date().toISOString() };
       if (localStorage.getItem(AUTH_KEEP_LOGGED_KEY) === 'true') {
         localStorage.setItem(AUTH_USER_KEY, JSON.stringify(next));
       }
@@ -104,16 +110,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo<AuthContextValue>(
-    () => ({
-      user,
-      isLoggedIn: user !== null,
-      displayName: user ? user.firstName || user.name : null,
-      login,
-      loginWithGoogle,
-      logout,
-      updateProfile,
-    }),
-    [user, login, loginWithGoogle, logout, updateProfile],
+    () => {
+      const hydratedUser = isHydrated ? user : null;
+      return {
+        user: hydratedUser,
+        isHydrated,
+        isLoggedIn: hydratedUser !== null,
+        roles: hydratedUser?.roles ?? PUBLIC_ROLES,
+        displayName: hydratedUser ? hydratedUser.name.split(' ')[0] : null,
+        login,
+        loginAs,
+        logout,
+        updateProfile,
+      };
+    },
+    [isHydrated, user, login, loginAs, logout, updateProfile],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

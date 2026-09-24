@@ -2,12 +2,20 @@
 import { useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useAuth } from '@/contexts/AuthContext';
 
-const QUICK_ACTIONS = [
-  { icon: 'menu_book', label: 'Partituras', to: '/study', description: 'Estudar e praticar' },
-  { icon: 'school', label: 'Alunos', to: '/students', description: 'Cadastro de alunos' },
-  { icon: 'library_music', label: 'Repertório', to: '/songs', description: 'Músicas e repertório' },
-  { icon: 'photo_library', label: 'Galeria', to: '/gallery-view', description: 'Fotos e vídeos' },
+const PUBLIC_ACTIONS = [
+  { icon: 'event', label: 'Agenda', to: '/agenda', description: 'Próximas apresentações' },
+  { icon: 'article', label: 'Blog', to: '/blog', description: 'Notícias e galeria' },
+  { icon: 'info', label: 'Sobre', to: '/sobre', description: 'História da banda' },
+  { icon: 'login', label: 'Área interna', to: '/login', description: 'Entrar com seu perfil' },
+] as const;
+
+const AUTH_ACTIONS = [
+  { icon: 'dashboard', label: 'Painel', to: '/gestao', description: 'Módulos do seu perfil' },
+  { icon: 'library_music', label: 'Músicas', to: '/gestao/musicas', description: 'Repertório e partituras' },
+  { icon: 'event', label: 'Agenda', to: '/agenda', description: 'Apresentações' },
+  { icon: 'article', label: 'Blog', to: '/blog', description: 'Portal público' },
 ] as const;
 
 const GALLERY = [
@@ -35,8 +43,12 @@ function shuffle<T>(arr: readonly T[]): T[] {
 }
 
 export default function HomePage() {
-  const shuffledGallery = useMemo(() => shuffle(GALLERY), []);
-  const shuffledVideos = useMemo(() => shuffle(YT_IDS), []);
+  const { isLoggedIn, isHydrated } = useAuth();
+  // Math.random() na renderização geraria ordens diferentes no servidor e no
+  // cliente. Mantemos a ordem fixa até hidratar e só então embaralhamos.
+  const shuffledGallery = useMemo(() => (isHydrated ? shuffle(GALLERY) : GALLERY), [isHydrated]);
+  const shuffledVideos = useMemo(() => (isHydrated ? shuffle(YT_IDS) : YT_IDS), [isHydrated]);
+  const quickActions = isLoggedIn ? AUTH_ACTIONS : PUBLIC_ACTIONS;
 
   return (
     
@@ -72,7 +84,7 @@ export default function HomePage() {
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-        {QUICK_ACTIONS.map((action) => (
+        {quickActions.map((action) => (
           <Link
             key={action.to}
             href={action.to}
@@ -140,6 +152,7 @@ export default function HomePage() {
                 src={`https://www.youtube.com/embed/${id}`}
                 title={`Vídeo ${i + 1}`}
                 className="w-full h-full rounded-lg shadow-sm"
+                loading="lazy"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               />

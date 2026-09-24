@@ -1,47 +1,73 @@
 'use client';
 
-import { useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { AUTHENTICATED_ROLES, ROLE_LABEL } from '@/core/auth/roles';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function LoginPage() {
-  const [keep, setKeep] = useState(true);
   const auth = useAuth();
   const router = useRouter();
+  const [email, setEmail] = useState('admin@bcl.local');
+  const [password, setPassword] = useState('admin');
+  const [keep, setKeep] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const goHome = () => router.push('/');
+  const goIn = () => router.push('/gestao');
+
+  const onSubmit = async (event: FormEvent) => {
+    event.preventDefault();
+    setError(null);
+    try {
+      await auth.login(email, password, keep);
+      goIn();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Não foi possível entrar.');
+    }
+  };
 
   return (
-    <div className="bg-card p-4 rounded-lg border border-border max-w-md mx-auto mt-16">
-      <div className="max-w-sm mx-auto px-4 py-8 md:py-16">
-        <h1 className="text-3xl font-bold mb-4">Entrar</h1>
-        <p className="mb-6">Login simulado (mesmo fluxo do app Angular).</p>
+    <div className="mx-auto max-w-md px-4 py-16">
+      <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-8 shadow-[var(--shadow-soft)]">
+        <p className="text-xs uppercase tracking-[0.2em] text-[var(--muted)]">Acesso interno</p>
+        <h1 className="mt-2 text-3xl font-semibold">Entrar</h1>
+        <p className="mt-2 text-sm text-[var(--muted)]">
+          Login simulado. Use um perfil de demonstração para ver as regras de permissão.
+        </p>
 
-        <label className="flex items-center gap-2 my-4 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={keep}
-            onChange={(e) => setKeep(e.target.checked)}
-            className="w-4 h-4"
-          />
-          <span>Manter conectado</span>
-        </label>
+        <form className="mt-8 flex flex-col gap-4" onSubmit={onSubmit}>
+          <label className="flex flex-col gap-1.5 text-sm">
+            E-mail
+            <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" required />
+          </label>
+          <label className="flex flex-col gap-1.5 text-sm">
+            Senha
+            <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" required />
+          </label>
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" checked={keep} onChange={(e) => setKeep(e.target.checked)} />
+            Manter conectado
+          </label>
+          {error && <p className="text-sm text-[var(--destructive)]">{error}</p>}
+          <button type="submit" className="btn-primary min-h-11">
+            Entrar
+          </button>
+        </form>
 
-        <div className="flex flex-col gap-3">
-          <button
-            type="button"
-            className="px-5 py-3 btn-primary font-semibold rounded-lg hover:opacity-90 transition-opacity"
-            onClick={() => auth.login('admin', keep).then(goHome)}
-          >
-            Entrar como Admin
-          </button>
-          <button
-            type="button"
-            className="px-5 py-3 btn-primary font-semibold rounded-lg hover:opacity-90 transition-opacity"
-            onClick={() => auth.login('user', keep).then(goHome)}
-          >
-            Entrar como Usuário
-          </button>
+        <div className="mt-8">
+          <p className="text-xs uppercase tracking-[0.2em] text-[var(--muted)]">Acesso rápido</p>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            {AUTHENTICATED_ROLES.map((role) => (
+              <button
+                key={role}
+                type="button"
+                className="btn-outline-primary min-h-11 text-sm"
+                onClick={() => auth.loginAs(role, keep).then(goIn)}
+              >
+                {ROLE_LABEL[role]}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>

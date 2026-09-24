@@ -57,6 +57,11 @@ export type StudySessionOptions = {
   onSnack?: (message: string) => void;
 };
 
+export type StudyInstrumentSelection = {
+  scoreInstrumentIds?: string[];
+  midiInstrumentIds?: string[];
+};
+
 function isMobileView() {
   if (typeof window === 'undefined') return false;
   return window.matchMedia('(max-width: 600px)').matches;
@@ -99,6 +104,7 @@ export class StudySession {
 
   private availableInstruments: InstrumentInfo[] = [];
   private selectedInstrumentIds: string[] = [];
+  private selectedMidiInstrumentIds: string[] = [];
   private lastAppliedInstrumentIds: string[] = [];
   private instrumentFilter = '';
   private showInstrumentSelection = false;
@@ -246,7 +252,12 @@ export class StudySession {
     this.emit();
   }
 
-  async loadStudy(xml: string, scoreId: string, displayName: string) {
+  async loadStudy(
+    xml: string,
+    scoreId: string,
+    displayName: string,
+    selection: StudyInstrumentSelection = {},
+  ) {
     const token = ++this.loadToken;
     this.scoreError = null;
     this.currentScoreId = scoreId;
@@ -265,7 +276,7 @@ export class StudySession {
     this.updateBpmRange();
     if (this.metronomeEnabled) this.restartMetronome();
 
-    this.initializeInstrumentsFromXml(scoreId, xml);
+    this.initializeInstrumentsFromXml(scoreId, xml, selection);
     this.instrumentCardCollapsed = true;
     this.emit();
 
@@ -306,6 +317,7 @@ export class StudySession {
   private resetInstruments() {
     this.availableInstruments = [];
     this.selectedInstrumentIds = [];
+    this.selectedMidiInstrumentIds = [];
     this.lastAppliedInstrumentIds = [];
     this.showInstrumentSelection = false;
     this.instrumentCardCollapsed = true;
@@ -335,13 +347,34 @@ export class StudySession {
     }
   }
 
-  private initializeInstrumentsFromXml(scoreId: string, xml: string) {
+  private initializeInstrumentsFromXml(
+    scoreId: string,
+    xml: string,
+    selection: StudyInstrumentSelection,
+  ) {
     const instruments = extractInstrumentsFromXml(xml);
     this.availableInstruments = instruments;
     const availableIds = new Set(this.availableInstruments.map((i) => i.id));
     const stored = this.readStoredSelection(scoreId).filter((id) => availableIds.has(id));
+    const requestedScoreIds = (selection.scoreInstrumentIds ?? []).filter((id) =>
+      availableIds.has(id),
+    );
+    const requestedMidiIds = (selection.midiInstrumentIds ?? []).filter((id) =>
+      availableIds.has(id),
+    );
+    const allIds = this.availableInstruments.map((i) => i.id);
     this.selectedInstrumentIds =
-      stored.length > 0 ? stored : this.availableInstruments.map((i) => i.id);
+      requestedScoreIds.length > 0
+        ? requestedScoreIds
+        : stored.length > 0
+          ? stored
+          : allIds;
+    this.selectedMidiInstrumentIds =
+      requestedMidiIds.length > 0
+        ? requestedMidiIds
+        : selection.midiInstrumentIds
+          ? allIds
+          : [...this.selectedInstrumentIds];
     this.lastAppliedInstrumentIds = [...this.selectedInstrumentIds];
     this.showInstrumentSelection = false;
   }
@@ -432,11 +465,19 @@ export class StudySession {
 
     try {
       const available = this.availableInstruments;
-      let selectedIds =
+      const selectedIds =
         this.selectedInstrumentIds.length > 0
           ? this.selectedInstrumentIds
           : available.map((i) => i.id);
-      const selectionKey = [...selectedIds].sort().join('|');
+      const midiSelectedIds =
+        this.selectedMidiInstrumentIds.length > 0
+          ? this.selectedMidiInstrumentIds
+          : selectedIds;
+      const selectionKey = `${[...selectedIds].sort().join('|')}::midi:${[
+        ...midiSelectedIds,
+      ]
+        .sort()
+        .join('|')}`;
       if (selectionKey === this.lastRenderedSelectionKey && this.xmlLoaded) {
         this.loading = false;
         this.scoreLoading = false;
@@ -445,10 +486,19 @@ export class StudySession {
       }
       const shouldFilter =
         available.length > 0 && selectedIds.length > 0 && selectedIds.length < available.length;
-      const xmlToUse = shouldFilter ? filterXmlByPartIds(this.sourceXml, selectedIds) : this.sourceXml;
-      await this.renderScoreWithOsmd(xmlToUse, token);
+      const shouldFilterMidi =
+        available.length > 0 &&
+        midiSelectedIds.length > 0 &&
+        midiSelectedIds.length < available.length;
+      const scoreXml = shouldFilter
+        ? filterXmlByPartIds(this.sourceXml, selectedIds)
+        : this.sourceXml;
+      const midiXml = shouldFilterMidi
+        ? filterXmlByPartIds(this.sourceXml, midiSelectedIds)
+        : this.sourceXml;
+      await this.renderScoreWithOsmd(scoreXml, token);
       if (token !== this.loadToken) return;
-      await this.initVerovioPlayerInHiddenContainer(xmlToUse, id, token);
+      await this.initVerovioPlayerInHiddenContainer(midiXml, id, token);
       if (token !== this.loadToken) return;
       this.lastRenderedSelectionKey = selectionKey;
       this.lastAppliedInstrumentIds = [...selectedIds];
@@ -594,6 +644,8 @@ export class StudySession {
       }
       this.playerController.player = this.player;
       this.playerReady = true;
+      // Player.create converte o MusicXML filtrado e já prepara seu MIDI interno.
+      this.midiLoaded = true;
       this.applyTempo();
       this.applyLoop();
       this.applyAudioVolume();

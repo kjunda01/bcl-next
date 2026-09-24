@@ -1,43 +1,32 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { getApiUrl } from '../../config/environment';
-import { getExampleLabel, STUDY_EXAMPLES } from '../../study/studyConfig';
 import { useStudySession } from '../../study/useStudySession';
 import { StudyInstrumentPanel } from '../../components/StudyInstrumentPanel';
 import { StudyPlayerPanel } from '../../components/StudyPlayerPanel';
-
-type SongOption = { id: string; label: string };
+import {
+  StudySongCatalog,
+  type StudyStartOptions,
+} from '../../components/study/StudySongCatalog';
 
 export default function StudyPage() {
-  const { id: routeId } = useParams<{ id?: string }>();
-  const navigate = useNavigate();
-  const apiUrlRef = useRef(getApiUrl());
-  apiUrlRef.current = getApiUrl();
+  const apiUrl = getApiUrl();
 
   const [snack, setSnack] = useState<string | null>(null);
   const { session, state, scoreContainerRef, osmdContainerRef } = useStudySession(
-    () => apiUrlRef.current,
+    () => apiUrl,
     (m) => {
       setSnack(m);
       window.setTimeout(() => setSnack(null), 4000);
     },
   );
 
-  const [idDraft, setIdDraft] = useState('');
-  const [songOptions, setSongOptions] = useState<SongOption[]>([]);
   const [selectedSongId, setSelectedSongId] = useState<string | null>(null);
-  const [selectedExampleId, setSelectedExampleId] = useState<string | null>(null);
   const [mobileSheetOpen, setMobileSheetOpen] = useState(false);
-  const [fetchError, setFetchError] = useState<string | null>(null);
-
-  const loadTokenRef = useRef(0);
-  const prevRouteIdRef = useRef<string | undefined>(undefined);
 
   const showInitialContent =
     !state.xmlLoaded &&
     !state.scoreLoading &&
-    !selectedExampleId &&
-    !routeId;
+    !selectedSongId;
 
   const instrumentsOpen =
     state.xmlLoaded &&
@@ -67,26 +56,6 @@ export default function StudyPage() {
   }, [state.fullscreenScore, state.isMobile]);
 
   useEffect(() => {
-    let cancelled = false;
-    fetch(`${apiUrlRef.current}/songs`)
-      .then((r) => (r.ok ? r.json() : []))
-      .then((data: unknown) => {
-        if (cancelled || !Array.isArray(data)) return;
-        const opts = data.map((s: { id?: unknown; title?: unknown }) => ({
-          id: String(s.id ?? ''),
-          label: String(s.title ?? `Partitura ${s.id}`),
-        }));
-        setSongOptions(opts.filter((o) => o.id));
-      })
-      .catch(() => {
-        if (!cancelled) setSongOptions([]);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  useEffect(() => {
     const onBlur = () => session.pause();
     const onVis = () => {
       if (document.hidden) session.pause();
@@ -99,99 +68,24 @@ export default function StudyPage() {
     };
   }, [session]);
 
-  const fetchLocalXml = useCallback(async (assetName: string) => {
-    const safe = assetName?.trim() || 'score.xml';
-    const bust = `?v=${Date.now()}`;
-    const res = await fetch(`/assets/${safe}${bust}`);
-    if (!res.ok) throw new Error('musicxml_not_found');
-    const xml = await res.text();
-    if (!xml || xml.trim().length < 20) throw new Error('musicxml_empty');
-    return xml;
-  }, []);
-
-  const fetchApiXml = useCallback(async (id: string) => {
-    const res = await fetch(`${apiUrlRef.current}/scores/${encodeURIComponent(id)}/musicxml`);
-    if (!res.ok) throw new Error('api_musicxml_failed');
-    const xml = await res.text();
-    if (!xml || xml.trim().length < 20) throw new Error('musicxml_empty');
-    return xml;
-  }, []);
-
-  const runLoad = useCallback(
-    async (mode: 'api' | 'local', payload: string, displayName: string, scoreKey: string) => {
-      const token = ++loadTokenRef.current;
-      setFetchError(null);
-      try {
-        const xml =
-          mode === 'api' ? await fetchApiXml(payload) : await fetchLocalXml(payload);
-        if (token !== loadTokenRef.current) return;
-        await session.loadStudy(xml, scoreKey, displayName);
-      } catch {
-        if (token !== loadTokenRef.current) return;
-        if (mode === 'api') {
-          try {
-            const xml = await fetchLocalXml('score.xml');
-            if (token !== loadTokenRef.current) return;
-            await session.loadStudy(xml, 'local:score.xml', getExampleLabel('score.xml'));
-            setFetchError(null);
-          } catch {
-            setFetchError('Não foi possível carregar a partitura.');
-          }
-        } else {
-          setFetchError('Não foi possível carregar a partitura.');
-        }
-      }
-    },
-    [fetchApiXml, fetchLocalXml, session],
-  );
-
-  useEffect(() => {
-    const prev = prevRouteIdRef.current;
-    prevRouteIdRef.current = routeId;
-
-    if (routeId) {
-      setIdDraft(routeId);
-      setSelectedSongId(routeId);
-      void runLoad('api', routeId, `ID ${routeId}`, routeId);
-      return;
-    }
-
-    if (prev && !routeId) {
-      loadTokenRef.current += 1;
-      session.reset();
-      setSelectedSongId(null);
-      setIdDraft('');
-      setSelectedExampleId(null);
-      setFetchError(null);
-    }
-  }, [routeId, runLoad, session]);
-
   const backToExamples = useCallback(() => {
-    loadTokenRef.current += 1;
     session.reset();
-    setSelectedExampleId(null);
     setSelectedSongId(null);
-    setIdDraft('');
-    setFetchError(null);
     setMobileSheetOpen(false);
-    navigate('/study', { replace: true });
-  }, [navigate, session]);
+  }, [session]);
 
-  const selectExample = (exampleId: string) => {
-    setSelectedExampleId(exampleId);
-    void runLoad('local', exampleId, getExampleLabel(exampleId), `local:${exampleId}`);
-  };
-
-  const selectSong = (songId: string) => {
+  const startStudy = ({
+    song,
+    xml,
+    scoreInstrumentIds,
+    midiInstrumentIds,
+  }: StudyStartOptions) => {
+    const songId = String(song.id);
     setSelectedSongId(songId);
-    setIdDraft(songId);
-    navigate(`/study/${encodeURIComponent(songId)}`, { replace: true });
-  };
-
-  const loadByTypedId = () => {
-    const id = idDraft.trim();
-    if (!id) return;
-    selectSong(id);
+    void session.loadStudy(xml, songId, song.title, {
+      scoreInstrumentIds,
+      midiInstrumentIds,
+    });
   };
 
   const playerSlice = useMemo(
@@ -219,7 +113,7 @@ export default function StudyPage() {
   );
 
   const showScoreBlock =
-    state.xmlLoaded || state.scoreLoading || selectedExampleId || routeId;
+    state.xmlLoaded || state.scoreLoading || selectedSongId;
 
   const desktopInstruments =
     state.xmlLoaded &&
@@ -246,83 +140,22 @@ export default function StudyPage() {
               <h1 className="m-0 text-3xl font-medium">Estudo</h1>
             </div>
             <p className="mt-1 text-gray-600 max-w-4xl">
-              Escolha uma partitura de exemplo ou uma música salva para começar a praticar.
+              Escolha uma música, configure a partitura e o MIDI e comece a praticar.
             </p>
           </div>
-          <div className="flex flex-wrap items-end gap-3">
-            <label className="flex flex-col gap-1">
-              <span className="text-xs font-medium text-gray-600">ID na API</span>
-              <input
-                type="text"
-                value={idDraft}
-                onChange={(e) => setIdDraft(e.target.value)}
-                placeholder="ex.: 1"
-                className="min-w-36 px-2.5 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-            </label>
-            {idDraft.trim() ? (
-              <button type="button" className="px-4 py-2.5 font-medium rounded-lg bg-primary text-white hover:opacity-90" onClick={loadByTypedId}>
-                Carregar
-              </button>
-            ) : null}
-            {state.xmlLoaded ? (
-              <button type="button" className="flex items-center gap-1.5 px-4 py-2.5 font-medium rounded-lg bg-white border border-gray-300 hover:bg-gray-50" onClick={backToExamples}>
-                <span className="material-icons text-lg" aria-hidden>
-                  arrow_back
-                </span>
-                Voltar aos exemplos
-              </button>
-            ) : null}
-          </div>
+          {state.xmlLoaded ? (
+            <button type="button" className="flex items-center gap-1.5 px-4 py-2.5 font-medium rounded-lg bg-white border border-gray-300 hover:bg-gray-50" onClick={backToExamples}>
+              <span className="material-icons text-lg" aria-hidden>
+                arrow_back
+              </span>
+              Escolher outra música
+            </button>
+          ) : null}
         </header>
       )}
 
       {showInitialContent ? (
-        <div className="bg-white border border-gray-300 rounded-2xl px-5 py-5">
-          <div className="flex items-start gap-3 mb-5">
-            <span className="material-icons text-3xl text-primary" aria-hidden>
-              library_music
-            </span>
-            <p className="m-0 text-gray-700">Selecione uma partitura de exemplo ou uma música salva para começar.</p>
-          </div>
-          <div>
-            <span className="block text-xs font-semibold uppercase tracking-widest text-gray-600 mb-2.5">Exemplos</span>
-            <div className="flex flex-wrap gap-2">
-              {STUDY_EXAMPLES.map((ex) => (
-                <button
-                  key={ex.id}
-                  type="button"
-                  className={`px-2.5 py-2 font-medium rounded-lg border text-sm ${selectedExampleId === ex.id ? 'border-primary bg-blue-50 text-primary' : 'border-gray-300 bg-white hover:bg-gray-50'}`}
-                  onClick={() => selectExample(ex.id)}
-                >
-                  {ex.label}
-                </button>
-              ))}
-            </div>
-          </div>
-          {songOptions.length > 0 ? (
-            <div className="mt-5">
-              <label className="flex flex-col gap-1.5">
-                <span className="text-sm font-medium text-gray-700">Partituras salvas</span>
-                <select
-                  value={selectedSongId ?? ''}
-                  onChange={(e) => {
-                    const v = e.target.value;
-                    if (v) selectSong(v);
-                  }}
-                  className="max-w-sm px-3 py-2 rounded-lg border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-primary"
-                >
-                  <option value="">Selecione uma música</option>
-                  {songOptions.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
-          ) : null}
-        </div>
+        <StudySongCatalog onStart={startStudy} />
       ) : null}
 
       <div className={`flex flex-col gap-5 flex-1 min-h-0 relative ${state.fullscreenScore && state.isMobile ? 'study-mobile-fullscreen' : ''}`}>
@@ -368,7 +201,7 @@ export default function StudyPage() {
               type="button"
               className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-transparent hover:bg-gray-200 cursor-pointer text-gray-700"
               onClick={backToExamples}
-              aria-label="Voltar aos exemplos"
+              aria-label="Voltar às músicas"
             >
               <span className="material-icons">arrow_back</span>
             </button>
@@ -505,10 +338,10 @@ export default function StudyPage() {
                 ) : null}
                 <div className="text-sm">
                   {state.scoreLoading ? <span className="text-gray-600">Carregando…</span> : null}
-                  {!state.scoreLoading && (fetchError || state.scoreError) ? (
-                    <span className="text-red-700">{fetchError ?? state.scoreError}</span>
+                  {!state.scoreLoading && state.scoreError ? (
+                    <span className="text-red-700">{state.scoreError}</span>
                   ) : null}
-                  {!state.scoreLoading && !fetchError && !state.scoreError ? (
+                  {!state.scoreLoading && !state.scoreError ? (
                     <span className="text-green-700">{state.xmlLoaded ? 'Pronto' : 'Pendente'}</span>
                   ) : null}
                 </div>

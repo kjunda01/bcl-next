@@ -1,15 +1,14 @@
 'use client';
 
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import LegacyStudyPage from '../../../legacy-pages/Study/StudyPage';
+import dynamic from 'next/dynamic';
+import { DomainGuard } from '@/components/domain/DomainGuard';
+
+const StudyRouteClient = dynamic(() => import('@/study/StudyRouteClient'), { ssr: false });
 
 export default function StudyRoutePage() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/study" element={<LegacyStudyPage />} />
-        <Route path="/study/:id" element={<LegacyStudyPage />} />
-      </Routes>
-    </BrowserRouter>
+    <DomainGuard resource="songs">
+      <StudyRouteClient />
+    </DomainGuard>
   );
 }

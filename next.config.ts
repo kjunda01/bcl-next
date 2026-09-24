@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Sem isso o Next bloqueia /_next/* quando o celular acessa o dev server
+  // pelo IP da rede local, o React não hidrata e os onClick não respondem.
+  allowedDevOrigins: ["192.168.*.*", "10.*.*.*"],
 };
 
 export default nextConfig;
