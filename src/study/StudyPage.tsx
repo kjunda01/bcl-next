@@ -129,7 +129,15 @@ export default function StudyPage() {
     state.isMobile;
 
   return (
-    <div className={`flex min-h-0 flex-1 flex-col gap-5 pb-5 ${state.fullscreenScore ? 'fixed inset-0 z-[1001] h-[100dvh] max-h-[100dvh] w-screen overflow-hidden bg-[var(--background)] pb-0' : ''}`}>
+    <div
+      className={`flex min-h-0 flex-1 flex-col gap-5 pb-5 ${
+        state.fullscreenScore
+          ? `fixed inset-0 z-[1001] h-[100dvh] max-h-[100dvh] w-screen overflow-hidden pb-0 ${
+              state.isMobile && state.xmlLoaded ? 'bg-[var(--score-canvas)]' : 'bg-[var(--background)]'
+            }`
+          : ''
+      }`}
+    >
       {snack ? <div className="fixed bottom-20 left-1/2 z-[1200] -translate-x-1/2 rounded-[var(--radius)] bg-[var(--color-ink)] px-4 py-2.5 text-sm text-[var(--header-fg)] shadow-[var(--shadow-soft)]" role="status">{snack}</div> : null}
 
       {!state.fullscreenScore && (
@@ -295,7 +303,11 @@ export default function StudyPage() {
         ) : null}
 
         {showScoreBlock ? (
-          <section className={`flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] shadow-[var(--shadow-soft)] ${state.fullscreenScore ? 'min-h-0 flex-1 rounded-none border-0 shadow-none' : ''}`}>
+          <section
+            className={`flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] shadow-[var(--shadow-soft)] ${
+              state.fullscreenScore ? 'score-view-shell min-h-0 flex-1 rounded-none border-0 shadow-none' : ''
+            }`}
+          >
             {state.fullscreenScore && !state.isMobile ? (
               <button
                 type="button"
@@ -362,17 +374,17 @@ export default function StudyPage() {
 
             <div className="flex-1 min-h-0 flex flex-col">
               <div
-                className={`score-container relative min-h-0 flex-1 overflow-auto bg-[var(--card-secondary)] ${state.fullscreenScore && state.isMobile ? 'max-h-none px-1 py-2' : 'max-h-[70vh] min-h-52 px-4 py-4'}`}
+                className={`score-container relative min-h-0 flex-1 overflow-auto ${state.fullscreenScore && state.isMobile ? 'max-h-none px-1 py-2' : 'max-h-[70vh] min-h-52 px-4 py-4'}`}
                 ref={scoreContainerRef}
               >
                 {state.scoreLoading ? (
-                  <div className="pointer-events-none absolute inset-0 z-5 flex flex-col items-center justify-center gap-4 bg-[var(--card)]/90">
+                  <div className="pointer-events-none absolute inset-0 z-5 flex flex-col items-center justify-center gap-4 bg-[var(--score-page)]/92">
                     <div className="flex flex-col gap-2.5 opacity-35" aria-hidden>
                       {Array.from({ length: 10 }).map((_, i) => (
-                        <div key={i} className="h-0.5 w-min(100%, 480px) rounded-sm bg-[var(--muted)]" />
+                        <div key={i} className="h-0.5 w-min(100%, 480px) rounded-sm bg-[var(--score-muted)]" />
                       ))}
                     </div>
-                    <p className="m-0 font-medium text-[var(--foreground)]">Carregando partitura…</p>
+                    <p className="m-0 font-medium text-[var(--score-ink)]">Carregando partitura…</p>
                   </div>
                 ) : null}
                 <div ref={osmdContainerRef} className="relative min-h-52 study-osmd-host" />

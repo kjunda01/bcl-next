@@ -344,6 +344,28 @@
 }
 
 @layer components {
+  .score-container {
+    color-scheme: light;
+    background-color: var(--score-canvas);
+    color: var(--score-ink);
+  }
+
+  .score-container .study-osmd-host {
+    background-color: var(--score-page);
+  }
+
+  .score-view-shell {
+    color-scheme: light;
+    background-color: var(--score-canvas) !important;
+    color: var(--score-ink);
+    border-color: #d7e0e8 !important;
+  }
+
+  body.study-mobile-fullscreen-active .score-container,
+  body.study-fullscreen-active .score-container {
+    background-color: var(--score-canvas);
+  }
+
   .score-container .study-osmd-host img[id^="cursorImg"] {
     z-index: 30 !important;
     pointer-events: none;

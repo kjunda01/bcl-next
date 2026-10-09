@@ -54,6 +54,12 @@
   --sidebar-border: #163044;
   --nav-bg: var(--color-white);
   --nav-border: var(--border);
+
+  /* Partitura (OSMD): sempre fundo de papel, independente do tema do app */
+  --score-canvas: #eef3f7;
+  --score-page: #ffffff;
+  --score-ink: var(--color-ink);
+  --score-muted: #5b6b7c;
 }
 
 .dark {
@@ -92,4 +98,9 @@
   --nav-bg: #0f2233;
   --nav-border: #1c354a;
   --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.35);
+
+  --score-canvas: #eef3f7;
+  --score-page: #ffffff;
+  --score-ink: #0b1c2c;
+  --score-muted: #5b6b7c;
 }
