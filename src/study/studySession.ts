@@ -1,5 +1,5 @@
 import { OpenSheetMusicDisplay } from 'opensheetmusicdisplay';
-import { Player, VerovioConverter, VerovioRenderer } from '@music-i18n/musicxml-player';
+import { Player, VerovioConverter, type ISheetRenderer } from '@music-i18n/musicxml-player';
 import { StudyPlayerController } from './studyPlayerController';
 import {
   extractTempoInfoFromXml,
@@ -7,6 +7,36 @@ import {
   filterXmlByPartIds,
   type InstrumentInfo,
 } from './studyUtils';
+
+/**
+ * O WASM do Verovio embarcado no musicxml-player traz 652 dos 1043 glifos que
+ * ele espera, e reclama disso ao construir o toolkit. Não afeta o MIDI — única
+ * coisa que usamos do Verovio — nem a partitura, que é desenhada pelo OSMD.
+ */
+const VEROVIO_FONT_NOISE = ['default SMuFL glyphs', 'font could not be loaded'];
+
+/**
+ * O Player exige um ISheetRenderer, mas quem desenha a partitura aqui é o OSMD.
+ * Usar o VerovioRenderer faria uma segunda engravação completa num container
+ * invisível a cada troca de instrumentos — custo alto no celular e sem uso.
+ */
+class HeadlessSheetRenderer implements ISheetRenderer {
+  player?: Player;
+
+  destroy() {}
+
+  async initialize() {}
+
+  moveTo() {}
+
+  onResize() {}
+
+  onEvent() {}
+
+  get version() {
+    return 'headless';
+  }
+}
 
 export type StudyViewSnapshot = {
   scoreLoading: boolean;
@@ -38,11 +68,13 @@ export type StudyViewSnapshot = {
   instruments: {
     available: InstrumentInfo[];
     selectedIds: string[];
+    midiSelectedIds: string[];
     filtered: InstrumentInfo[];
     selectionMatchesApplied: boolean;
     showSelection: boolean;
     cardCollapsed: boolean;
     allSelected: boolean;
+    midiAllSelected: boolean;
     summary: string;
     filter: string;
   };
@@ -61,6 +93,12 @@ export type StudyInstrumentSelection = {
   scoreInstrumentIds?: string[];
   midiInstrumentIds?: string[];
 };
+
+function sameIdSet(left: string[], right: string[]) {
+  if (left.length !== right.length) return false;
+  const ids = new Set(left);
+  return right.every((id) => ids.has(id));
+}
 
 function isMobileView() {
   if (typeof window === 'undefined') return false;
@@ -105,6 +143,7 @@ export class StudySession {
   private availableInstruments: InstrumentInfo[] = [];
   private selectedInstrumentIds: string[] = [];
   private selectedMidiInstrumentIds: string[] = [];
+  private lastAppliedMidiInstrumentIds: string[] = [];
   private lastAppliedInstrumentIds: string[] = [];
   private instrumentFilter = '';
   private showInstrumentSelection = false;
@@ -173,13 +212,13 @@ export class StudySession {
     const allSelected =
       this.availableInstruments.length > 0 &&
       this.selectedInstrumentIds.length === this.availableInstruments.length;
+    const midiAllSelected =
+      this.availableInstruments.length > 0 &&
+      this.selectedMidiInstrumentIds.length === this.availableInstruments.length;
 
-    let selectionMatchesApplied =
-      this.selectedInstrumentIds.length === this.lastAppliedInstrumentIds.length;
-    if (selectionMatchesApplied) {
-      const cur = new Set(this.selectedInstrumentIds);
-      selectionMatchesApplied = this.lastAppliedInstrumentIds.every((id) => cur.has(id));
-    } else selectionMatchesApplied = false;
+    const selectionMatchesApplied =
+      sameIdSet(this.selectedInstrumentIds, this.lastAppliedInstrumentIds) &&
+      sameIdSet(this.selectedMidiInstrumentIds, this.lastAppliedMidiInstrumentIds);
 
     return {
       scoreLoading: this.scoreLoading,
@@ -211,11 +250,13 @@ export class StudySession {
       instruments: {
         available: this.availableInstruments,
         selectedIds: [...this.selectedInstrumentIds],
+        midiSelectedIds: [...this.selectedMidiInstrumentIds],
         filtered,
         selectionMatchesApplied,
         showSelection: this.showInstrumentSelection,
         cardCollapsed: this.instrumentCardCollapsed,
         allSelected,
+        midiAllSelected,
         summary,
         filter: this.instrumentFilter,
       },
@@ -319,6 +360,7 @@ export class StudySession {
     this.selectedInstrumentIds = [];
     this.selectedMidiInstrumentIds = [];
     this.lastAppliedInstrumentIds = [];
+    this.lastAppliedMidiInstrumentIds = [];
     this.showInstrumentSelection = false;
     this.instrumentCardCollapsed = true;
     this.instrumentFilter = '';
@@ -328,20 +370,35 @@ export class StudySession {
     return `study_instruments_${id}`;
   }
 
-  private readStoredSelection(id: string): string[] {
+  private readStoredSelection(id: string): { score: string[]; midi: string[] } {
     try {
       const raw = localStorage.getItem(this.storageKey(id));
-      if (!raw) return [];
+      if (!raw) return { score: [], midi: [] };
       const parsed = JSON.parse(raw) as unknown;
-      return Array.isArray(parsed) ? parsed.filter((x): x is string => typeof x === 'string') : [];
+      if (Array.isArray(parsed)) {
+        const score = parsed.filter((item): item is string => typeof item === 'string');
+        return { score, midi: score };
+      }
+      if (parsed && typeof parsed === 'object') {
+        const record = parsed as { score?: unknown; midi?: unknown };
+        return {
+          score: Array.isArray(record.score)
+            ? record.score.filter((item): item is string => typeof item === 'string')
+            : [],
+          midi: Array.isArray(record.midi)
+            ? record.midi.filter((item): item is string => typeof item === 'string')
+            : [],
+        };
+      }
+      return { score: [], midi: [] };
     } catch {
-      return [];
+      return { score: [], midi: [] };
     }
   }
 
-  private persistSelection(id: string, selection: string[]) {
+  private persistSelection(id: string, score: string[], midi: string[]) {
     try {
-      localStorage.setItem(this.storageKey(id), JSON.stringify(selection));
+      localStorage.setItem(this.storageKey(id), JSON.stringify({ score, midi }));
     } catch {
       /* ignore */
     }
@@ -355,7 +412,9 @@ export class StudySession {
     const instruments = extractInstrumentsFromXml(xml);
     this.availableInstruments = instruments;
     const availableIds = new Set(this.availableInstruments.map((i) => i.id));
-    const stored = this.readStoredSelection(scoreId).filter((id) => availableIds.has(id));
+    const stored = this.readStoredSelection(scoreId);
+    const storedScore = stored.score.filter((id) => availableIds.has(id));
+    const storedMidi = stored.midi.filter((id) => availableIds.has(id));
     const requestedScoreIds = (selection.scoreInstrumentIds ?? []).filter((id) =>
       availableIds.has(id),
     );
@@ -366,16 +425,17 @@ export class StudySession {
     this.selectedInstrumentIds =
       requestedScoreIds.length > 0
         ? requestedScoreIds
-        : stored.length > 0
-          ? stored
+        : storedScore.length > 0
+          ? storedScore
           : allIds;
     this.selectedMidiInstrumentIds =
       requestedMidiIds.length > 0
         ? requestedMidiIds
-        : selection.midiInstrumentIds
-          ? allIds
-          : [...this.selectedInstrumentIds];
+        : storedMidi.length > 0
+          ? storedMidi
+          : allIds;
     this.lastAppliedInstrumentIds = [...this.selectedInstrumentIds];
+    this.lastAppliedMidiInstrumentIds = [...this.selectedMidiInstrumentIds];
     this.showInstrumentSelection = false;
   }
 
@@ -389,34 +449,50 @@ export class StudySession {
     if (checked) selected.add(id);
     else selected.delete(id);
     this.selectedInstrumentIds = Array.from(selected);
-    this.ensureValidSelectionOrRestore();
-    this.emit();
-  }
-
-  selectOnlyInstrument(id: string) {
-    this.selectedInstrumentIds = [id];
-    this.ensureValidSelectionOrRestore();
     this.emit();
   }
 
   selectAllInstruments() {
     if (this.availableInstruments.length === 0) return;
     this.selectedInstrumentIds = this.availableInstruments.map((i) => i.id);
-    this.ensureValidSelectionOrRestore();
+    this.emit();
+  }
+
+  clearSelectedInstruments() {
+    this.selectedInstrumentIds = [];
+    this.emit();
+  }
+
+  toggleMidiInstrument(id: string, checked: boolean) {
+    const selected = new Set(this.selectedMidiInstrumentIds);
+    if (checked) selected.add(id);
+    else selected.delete(id);
+    this.selectedMidiInstrumentIds = Array.from(selected);
+    this.emit();
+  }
+
+  selectAllMidiInstruments() {
+    if (this.availableInstruments.length === 0) return;
+    this.selectedMidiInstrumentIds = this.availableInstruments.map((i) => i.id);
+    this.emit();
+  }
+
+  clearSelectedMidiInstruments() {
+    this.selectedMidiInstrumentIds = [];
     this.emit();
   }
 
   restoreAppliedInstruments() {
-    if (this.lastAppliedInstrumentIds.length === 0) return;
     this.selectedInstrumentIds = [...this.lastAppliedInstrumentIds];
+    this.selectedMidiInstrumentIds = [...this.lastAppliedMidiInstrumentIds];
     this.instrumentFilter = '';
     this.emit();
   }
 
   applySelectedInstruments() {
     if (!this.sourceXml || this.availableInstruments.length === 0) return;
-    if (this.selectedInstrumentIds.length === 0) {
-      this.ensureValidSelectionOrRestore();
+    if (this.selectedInstrumentIds.length === 0 || this.selectedMidiInstrumentIds.length === 0) {
+      this.options.onSnack?.('Selecione ao menos um instrumento na partitura e no MIDI.');
       return;
     }
     this.instrumentFilter = '';
@@ -435,6 +511,7 @@ export class StudySession {
   cancelInstrumentSelection() {
     this.pause();
     this.selectedInstrumentIds = [...this.lastAppliedInstrumentIds];
+    this.selectedMidiInstrumentIds = [...this.lastAppliedMidiInstrumentIds];
     this.instrumentFilter = '';
     this.showInstrumentSelection = false;
     this.emit();
@@ -450,12 +527,6 @@ export class StudySession {
     this.emit();
   }
 
-  private ensureValidSelectionOrRestore() {
-    if (this.availableInstruments.length === 0 || this.selectedInstrumentIds.length > 0) return;
-    this.options.onSnack?.('Selecione ao menos um instrumento.');
-    this.selectedInstrumentIds = [...this.lastAppliedInstrumentIds];
-  }
-
   private async applyInstrumentSelection(id: string, token: number) {
     if (!this.sourceXml || token !== this.loadToken) return;
     this.loading = true;
@@ -465,14 +536,8 @@ export class StudySession {
 
     try {
       const available = this.availableInstruments;
-      const selectedIds =
-        this.selectedInstrumentIds.length > 0
-          ? this.selectedInstrumentIds
-          : available.map((i) => i.id);
-      const midiSelectedIds =
-        this.selectedMidiInstrumentIds.length > 0
-          ? this.selectedMidiInstrumentIds
-          : selectedIds;
+      const selectedIds = this.selectedInstrumentIds;
+      const midiSelectedIds = this.selectedMidiInstrumentIds;
       const selectionKey = `${[...selectedIds].sort().join('|')}::midi:${[
         ...midiSelectedIds,
       ]
@@ -502,7 +567,8 @@ export class StudySession {
       if (token !== this.loadToken) return;
       this.lastRenderedSelectionKey = selectionKey;
       this.lastAppliedInstrumentIds = [...selectedIds];
-      this.persistSelection(id, selectedIds);
+      this.lastAppliedMidiInstrumentIds = [...midiSelectedIds];
+      this.persistSelection(id, selectedIds, midiSelectedIds);
       this.scheduleMidiPrefetch();
       this.scheduleMidiWarmup();
     } finally {
@@ -516,8 +582,6 @@ export class StudySession {
 
   private async renderScoreWithOsmd(xml: string, token: number) {
     if (token !== this.loadToken) return;
-    const el = this.options.getOsmdContainer();
-    if (!el) return;
     this.scoreLoading = true;
     this.emit();
     try {
@@ -527,11 +591,19 @@ export class StudySession {
         /* ignore */
       }
       this.osmd = null;
-      this.clearOsmdInner(el);
+      // Na primeira música o container ainda não existe: ele só monta quando a
+      // página troca o catálogo pelo bloco da partitura. Por isso esperamos o
+      // ref aparecer antes de ler, em vez de desistir na hora.
       const ready = await this.waitForOsmdContainer(token);
-      if (!ready || token !== this.loadToken) return;
+      if (token !== this.loadToken) return;
       const mount = this.options.getOsmdContainer();
-      if (!mount) return;
+      if (!ready || !mount) {
+        this.scoreLoading = false;
+        this.scoreError = 'Não foi possível montar a área da partitura.';
+        this.emit();
+        return;
+      }
+      this.clearOsmdInner(mount);
       this.osmd = new OpenSheetMusicDisplay(mount, {
         drawingParameters: 'default',
         autoResize: true,
@@ -546,7 +618,8 @@ export class StudySession {
         this.scoreLoading = false;
         if (isMobileView()) this.fullscreenScore = true;
       }
-    } catch {
+    } catch (err) {
+      console.error('Falha ao renderizar a partitura com o OSMD:', err);
       if (token === this.loadToken) {
         this.scoreLoading = false;
         this.scoreError = 'Falha ao renderizar a partitura.';
@@ -607,7 +680,7 @@ export class StudySession {
       if (token !== this.loadToken) return false;
       this.hiddenPlayerContainer = el;
       const converter = new VerovioConverter();
-      const renderer = new VerovioRenderer();
+      const renderer = new HeadlessSheetRenderer();
       try {
         this.player = await Player.create({
           container: el,
@@ -630,13 +703,13 @@ export class StudySession {
       this.patchScrollIntoView();
       let ok = false;
       try {
-        ok = await tryCreate();
+        ok = await this.withoutVerovioFontNoise(tryCreate);
       } catch (firstErr) {
         console.warn('Study player init (1ª tentativa) falhou:', firstErr);
         if (token !== this.loadToken) return;
         await new Promise((r) => setTimeout(r, 800));
         if (token !== this.loadToken) return;
-        ok = await tryCreate();
+        ok = await this.withoutVerovioFontNoise(tryCreate);
       }
       if (!ok || token !== this.loadToken) {
         if (token === this.loadToken) this.destroyVerovioAndHiddenContainer();
@@ -699,6 +772,21 @@ export class StudySession {
     this.stopLoopMonitor();
     this.midiLoaded = false;
     this.midiLoading = false;
+  }
+
+  /** Esconde só as queixas de fonte do Verovio, e só enquanto o toolkit é criado. */
+  private async withoutVerovioFontNoise<T>(fn: () => Promise<T>): Promise<T> {
+    const original = console.error;
+    console.error = (...args: unknown[]) => {
+      const text = typeof args[0] === 'string' ? args[0] : '';
+      if (VEROVIO_FONT_NOISE.some((noise) => text.includes(noise))) return;
+      original.apply(console, args);
+    };
+    try {
+      return await fn();
+    } finally {
+      console.error = original;
+    }
   }
 
   private patchAudioWorklet() {

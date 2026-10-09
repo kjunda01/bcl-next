@@ -1,0 +1,95 @@
+/**
+ * Identidade visual global.
+ * Altere tipografia, cores e raios neste arquivo — o restante do app
+ * consome apenas as variáveis abaixo (inspirado em https://www.drone.io/).
+ */
+:root {
+  color-scheme: light;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-sans);
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  --font-size-base: 16px;
+  --line-height-base: 1.6;
+  --tracking-tight: -0.02em;
+
+  --color-brand: #00c2ce;
+  --color-brand-strong: #00a8b3;
+  --color-brand-soft: #e6fafb;
+  --color-ink: #0b1c2c;
+  --color-ink-soft: #243447;
+  --color-mist: #f4f7fa;
+  --color-white: #ffffff;
+
+  --background: var(--color-mist);
+  --foreground: var(--color-ink);
+  --muted: #5b6b7c;
+  --muted-foreground: #7a8a9a;
+  --popover: var(--color-white);
+  --popover-foreground: var(--color-ink);
+  --border: #d7e0e8;
+  --input: var(--color-white);
+  --card: var(--color-white);
+  --card-secondary: #eef3f7;
+  --card-foreground: var(--color-ink);
+  --primary: var(--color-brand);
+  --primary-foreground: var(--color-ink);
+  --secondary: #e8eef3;
+  --secondary-foreground: var(--color-ink);
+  --info: #1b4d6b;
+  --info-foreground: var(--color-white);
+  --accent: var(--color-brand-soft);
+  --accent-foreground: var(--color-ink);
+  --destructive: #dc2626;
+  --destructive-foreground: var(--color-white);
+  --ring: var(--color-brand);
+  --radius: 0.75rem;
+  --shadow-soft: 0 10px 30px rgba(11, 28, 44, 0.08);
+
+  --code-bg: #eef3f7;
+  --header-bg: var(--color-ink);
+  --header-fg: var(--color-white);
+  --sidebar-bg: var(--color-ink);
+  --sidebar-fg: #d7e8ee;
+  --sidebar-border: #163044;
+  --nav-bg: var(--color-white);
+  --nav-border: var(--border);
+}
+
+.dark {
+  color-scheme: dark;
+  --color-brand: #2ad4de;
+  --color-brand-strong: #00c2ce;
+  --color-brand-soft: #12313a;
+  --background: #07131e;
+  --foreground: #e8f1f6;
+  --muted: #8aa0b2;
+  --muted-foreground: #6f8597;
+  --popover: #0f2233;
+  --popover-foreground: #e8f1f6;
+  --border: #1c354a;
+  --input: #0f2233;
+  --card: #0f2233;
+  --card-secondary: #163044;
+  --card-foreground: #e8f1f6;
+  --primary: var(--color-brand);
+  --primary-foreground: #07131e;
+  --secondary: #163044;
+  --secondary-foreground: #e8f1f6;
+  --info: #2ad4de;
+  --info-foreground: #07131e;
+  --accent: #12313a;
+  --accent-foreground: #e8f1f6;
+  --destructive: #f07171;
+  --destructive-foreground: #07131e;
+  --ring: var(--color-brand);
+  --code-bg: #163044;
+  --header-bg: #07131e;
+  --header-fg: #e8f1f6;
+  --sidebar-bg: #0b1c2c;
+  --sidebar-fg: #d7e8ee;
+  --sidebar-border: #1c354a;
+  --nav-bg: #0f2233;
+  --nav-border: #1c354a;
+  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.35);
+}

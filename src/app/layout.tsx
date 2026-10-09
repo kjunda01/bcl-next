@@ -1,12 +1,19 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
-import { AppShell } from "@/layouts/AppShell";
+import { RootShell } from "@/layouts/RootShell";
 import "./globals.scss";
 
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "BCL - Escola de Música",
-  description: "Sistema de gestão da Banda de Música de Lagoa Santa",
+  title: "Banda Carmelitana Luminarense",
+  description: "Portal e gestão da Banda Carmelitana Luminarense",
 };
 
 export default function RootLayout({
@@ -15,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className="h-full antialiased" data-scroll-behavior="smooth">
+    <html lang="pt-BR" className={`h-full antialiased ${inter.variable}`} data-scroll-behavior="smooth">
       <head>
         <link
           rel="stylesheet"
@@ -25,9 +32,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <ThemeProvider>
           <AuthProvider>
-            <AppShell>
-              {children}
-            </AppShell>
+            <RootShell>{children}</RootShell>
           </AuthProvider>
         </ThemeProvider>
       </body>

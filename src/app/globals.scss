@@ -1,74 +1,5 @@
 @import "tailwindcss";
-
-:root {
-  color-scheme: light;
-  /* Cores base */
-  --background: #f8fafc;
-  --foreground: #111725;
-  --muted: #6b7280;
-  --muted-foreground: #9ca3af;
-  --popover: #ffffff;
-  --popover-foreground: #111827;
-  --border: #e5e7eb;
-  --input: #ffffff;
-  --card: #ffffff;
-  --card-secondary: #f3f4f6;
-  --card-foreground: #111827;
-  --primary: #2563eb;
-  --primary-foreground: #ffffff;
-  --secondary: #f3f4f6;
-  --secondary-foreground: #111827;
-  --info: #4c65b8;
-  --info-foreground: #e3ebea;
-  --accent: #f3f4f6;
-  --accent-foreground: #111827;
-  --destructive: #dc2626;
-  --destructive-foreground: #ffffff;
-  --ring: #2563eb;
-  --radius: 0.5rem;
-
-  /* Específicos da app */
-  --code-bg: #f8fafc;
-  --sidebar-bg: #ffffff;
-  --sidebar-border: #e5e7eb;
-  --nav-bg: #ffffff;
-  --nav-border: #e5e7eb;
-}
-
-.dark {
-  color-scheme: dark;
-  /* Cores base */
-  --background: #0f172a;
-  --foreground: #f8fafc;
-  --muted: #64748b;
-  --muted-foreground: #94a3b8;
-  --popover: #1e293b;
-  --popover-foreground: #f8fafc;
-  --border: #334155;
-  --input: #1e293b;
-  --card: #1e293b;
-  --card-secondary: #293953;
-  --card-foreground: #f8fafc;
-  --primary: #2556a5;
-  --primary-foreground: #ffffff;
-  --secondary: #334155;
-  --secondary-foreground: #f8fafc;
-  --info: #384b86;
-  --info-foreground: #e3ebea;
-  --accent: #334155;
-  --accent-foreground: #f8fafc;
-  --destructive: #b93c3c;
-  --destructive-foreground: #ffffff;
-  --ring: #3b82f6;
-  --radius: 0.5rem;
-
-  /* Específicos da app */
-  --code-bg: #1e293b;
-  --sidebar-bg: #1e293b;
-  --sidebar-border: #334155;
-  --nav-bg: #1e293b;
-  --nav-border: #334155;
-}
+@import "../core/theme/tokens.css";
 
 @layer utilities {
   // Utilitários de texto
@@ -149,10 +80,11 @@
     padding: 0.5rem 1rem;
     font-weight: 500;
     
+    color: var(--primary-foreground);
     &:hover {
       opacity: 0.9;
       transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+      box-shadow: 0 4px 12px color-mix(in srgb, var(--color-brand) 35%, transparent);
     }
     
     &:active {
@@ -421,7 +353,9 @@
     min-height: 100%;
     background: var(--background);
     color: var(--foreground);
-    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-base);
   }
 
   h1 {

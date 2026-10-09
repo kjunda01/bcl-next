@@ -127,8 +127,8 @@ export default function StudyPage() {
     state.isMobile;
 
   return (
-    <div className={`flex flex-col flex-1 min-h-0 gap-5 pb-5 ${state.fullscreenScore ? 'fixed inset-0 z-[1001] overflow-hidden pb-0 w-screen h-[100dvh] max-h-[100dvh] bg-gray-50' : ''}`}>
-      {snack ? <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[1200] px-4 py-2.5 bg-gray-800 text-white rounded-lg text-sm shadow-lg" role="status">{snack}</div> : null}
+    <div className={`flex min-h-0 flex-1 flex-col gap-5 pb-5 ${state.fullscreenScore ? 'fixed inset-0 z-[1001] h-[100dvh] max-h-[100dvh] w-screen overflow-hidden bg-[var(--background)] pb-0' : ''}`}>
+      {snack ? <div className="fixed bottom-20 left-1/2 z-[1200] -translate-x-1/2 rounded-[var(--radius)] bg-[var(--color-ink)] px-4 py-2.5 text-sm text-[var(--header-fg)] shadow-[var(--shadow-soft)]" role="status">{snack}</div> : null}
 
       {!state.fullscreenScore && (
         <header className="flex flex-wrap items-end justify-between gap-4 px-4 py-2">
@@ -137,14 +137,14 @@ export default function StudyPage() {
               <span className="material-icons text-3xl text-primary" aria-hidden>
                 music_note
               </span>
-              <h1 className="m-0 text-3xl font-medium">Estudo</h1>
+              <h1 className="m-0 text-3xl font-semibold tracking-tight">Estudo</h1>
             </div>
-            <p className="mt-1 text-gray-600 max-w-4xl">
+            <p className="mt-1 max-w-4xl text-[var(--muted)]">
               Escolha uma música, configure a partitura e o MIDI e comece a praticar.
             </p>
           </div>
           {state.xmlLoaded ? (
-            <button type="button" className="flex items-center gap-1.5 px-4 py-2.5 font-medium rounded-lg bg-white border border-gray-300 hover:bg-gray-50" onClick={backToExamples}>
+            <button type="button" className="btn-outline-primary inline-flex min-h-11 items-center gap-1.5" onClick={backToExamples}>
               <span className="material-icons text-lg" aria-hidden>
                 arrow_back
               </span>
@@ -158,23 +158,28 @@ export default function StudyPage() {
         <StudySongCatalog onStart={startStudy} />
       ) : null}
 
-      <div className={`flex flex-col gap-5 flex-1 min-h-0 relative ${state.fullscreenScore && state.isMobile ? 'study-mobile-fullscreen' : ''}`}>
+      <div className={`relative flex min-h-0 flex-1 gap-4 ${state.fullscreenScore && state.isMobile ? 'study-mobile-fullscreen flex-col' : 'flex-col lg:flex-row lg:items-start'}`}>
         {mobileInstruments && instrumentsOpen ? (
-          <aside className="fixed left-0 top-0 bottom-0 w-[90vw] max-w-80 z-[1100] bg-white border-r border-gray-300 shadow-2xl flex flex-col transform -translate-x-full visibility-hidden transition-all" role="dialog" aria-label="Menu de instrumentos">
+          <aside className="fixed bottom-0 left-0 top-0 z-[1100] flex w-[90vw] max-w-80 translate-x-0 flex-col border-r border-[var(--border)] bg-[var(--card)] shadow-[var(--shadow-soft)]" role="dialog" aria-label="Menu de instrumentos">
             <StudyInstrumentPanel
               available={state.instruments.available}
               selectedIds={state.instruments.selectedIds}
+              midiSelectedIds={state.instruments.midiSelectedIds}
               filtered={state.instruments.filtered}
               selectionMatchesApplied={state.instruments.selectionMatchesApplied}
               filter={state.instruments.filter}
               loading={state.loading}
               xmlLoaded={state.xmlLoaded}
               allSelected={state.instruments.allSelected}
+              midiAllSelected={state.instruments.midiAllSelected}
               onFilterChange={(v) => session.setInstrumentFilter(v)}
               onToggle={(id, c) => session.toggleInstrument(id, c)}
-              onSelectOnly={(id) => session.selectOnlyInstrument(id)}
+              onToggleMidi={(id, c) => session.toggleMidiInstrument(id, c)}
               onSelectAllChange={(checked) =>
-                checked ? session.selectAllInstruments() : session.restoreAppliedInstruments()
+                checked ? session.selectAllInstruments() : session.clearSelectedInstruments()
+              }
+              onSelectAllMidiChange={(checked) =>
+                checked ? session.selectAllMidiInstruments() : session.clearSelectedMidiInstruments()
               }
               onApply={() => session.applySelectedInstruments()}
               onCancel={() => session.cancelInstrumentSelection()}
@@ -186,7 +191,7 @@ export default function StudyPage() {
         {mobileInstruments && state.instruments.cardCollapsed ? (
           <button
             type="button"
-            className="fixed left-0 top-2/5 z-[1101] inline-flex items-center justify-center gap-2 min-w-[3rem] h-12 px-2 border-0 rounded-r-lg bg-white text-gray-900 cursor-pointer shadow-md opacity-90 hover:opacity-100 hover:pl-3 hover:pr-3.5"
+            className="fixed left-0 top-2/5 z-[1101] inline-flex h-12 min-w-12 cursor-pointer items-center justify-center gap-2 rounded-r-lg border border-[var(--border)] bg-[var(--card)] px-2 text-[var(--foreground)] shadow-[var(--shadow-soft)]"
             onClick={() => session.toggleInstrumentsMenu()}
             aria-label="Expandir instrumentos"
           >
@@ -196,19 +201,19 @@ export default function StudyPage() {
         ) : null}
 
         {state.fullscreenScore && state.isMobile ? (
-          <header className="flex items-center gap-2 px-2 py-1.5 border-b border-gray-300 flex-shrink-0">
+          <header className="flex flex-shrink-0 items-center gap-2 border-b border-[var(--border)] bg-[var(--card)] px-2 py-1.5">
             <button
               type="button"
-              className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-transparent hover:bg-gray-200 cursor-pointer text-gray-700"
+              className="inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-full text-[var(--foreground)] hover:bg-[var(--card-secondary)]"
               onClick={backToExamples}
               aria-label="Voltar às músicas"
             >
               <span className="material-icons">arrow_back</span>
             </button>
-            <span className="flex-1 text-center font-medium text-sm overflow-hidden text-ellipsis whitespace-nowrap">{state.currentScoreName}</span>
+            <span className="flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-center text-sm font-medium">{state.currentScoreName}</span>
             <button
               type="button"
-              className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-transparent hover:bg-gray-200 cursor-pointer text-gray-700"
+              className="inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-full text-[var(--foreground)] hover:bg-[var(--card-secondary)]"
               onClick={() => setMobileSheetOpen((o) => !o)}
               aria-label="Controles"
             >
@@ -220,24 +225,28 @@ export default function StudyPage() {
         {desktopInstruments ? (
           <>
             <aside
-              className="fixed left-0 top-14 bottom-0 w-80 max-w-[90vw] z-[1100] bg-white border-r border-gray-300 shadow-lg flex flex-col"
-              role="dialog"
+              className={`hidden h-[min(72vh,calc(100dvh-10rem))] w-80 shrink-0 flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] shadow-[var(--shadow-soft)] lg:flex ${state.instruments.cardCollapsed ? 'lg:hidden' : ''}`}
               aria-label="Menu de instrumentos"
             >
               <StudyInstrumentPanel
                 available={state.instruments.available}
                 selectedIds={state.instruments.selectedIds}
+                midiSelectedIds={state.instruments.midiSelectedIds}
                 filtered={state.instruments.filtered}
                 selectionMatchesApplied={state.instruments.selectionMatchesApplied}
                 filter={state.instruments.filter}
                 loading={state.loading}
                 xmlLoaded={state.xmlLoaded}
                 allSelected={state.instruments.allSelected}
+                midiAllSelected={state.instruments.midiAllSelected}
                 onFilterChange={(v) => session.setInstrumentFilter(v)}
                 onToggle={(id, c) => session.toggleInstrument(id, c)}
-                onSelectOnly={(id) => session.selectOnlyInstrument(id)}
+                onToggleMidi={(id, c) => session.toggleMidiInstrument(id, c)}
                 onSelectAllChange={(checked) =>
-                  checked ? session.selectAllInstruments() : session.restoreAppliedInstruments()
+                  checked ? session.selectAllInstruments() : session.clearSelectedInstruments()
+                }
+                onSelectAllMidiChange={(checked) =>
+                  checked ? session.selectAllMidiInstruments() : session.clearSelectedMidiInstruments()
                 }
                 onApply={() => session.applySelectedInstruments()}
                 onCancel={() => session.cancelInstrumentSelection()}
@@ -248,7 +257,7 @@ export default function StudyPage() {
             {state.instruments.cardCollapsed ? (
               <button
                 type="button"
-                className="fixed left-0 top-2/5 z-[1101] inline-flex items-center justify-center gap-2 min-w-[3rem] h-12 px-2 border-0 rounded-r-lg bg-white text-gray-900 cursor-pointer shadow-md opacity-90 hover:opacity-100"
+                className="inline-flex h-12 min-w-12 shrink-0 cursor-pointer items-center justify-center gap-2 self-start rounded-2xl border border-[var(--border)] bg-[var(--card)] px-2 text-[var(--foreground)] shadow-[var(--shadow-soft)]"
                 onClick={() => session.toggleInstrumentsMenu()}
                 aria-label="Expandir instrumentos"
               >
@@ -259,8 +268,9 @@ export default function StudyPage() {
           </>
         ) : null}
 
+        <div className="flex min-w-0 flex-1 flex-col gap-4">
         {!(state.fullscreenScore && state.isMobile) && showScoreBlock ? (
-          <div className="w-full min-h-0">
+          <div className="min-h-0 w-full">
             <div className="flex flex-col gap-5 min-w-0">
               {state.xmlLoaded ? (
                 <StudyPlayerPanel
@@ -283,11 +293,11 @@ export default function StudyPage() {
         ) : null}
 
         {showScoreBlock ? (
-          <section className={`flex flex-col flex-1 min-h-0 bg-white border border-gray-300 rounded-2xl overflow-hidden ${state.fullscreenScore ? 'flex-1 rounded-none border-0 min-h-0' : ''}`}>
+          <section className={`flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] shadow-[var(--shadow-soft)] ${state.fullscreenScore ? 'min-h-0 flex-1 rounded-none border-0 shadow-none' : ''}`}>
             {state.fullscreenScore ? (
               <button
                 type="button"
-                className="absolute top-3 right-3 z-20 inline-flex items-center gap-2 px-3 py-2 bg-white/95 border border-gray-300 rounded-lg cursor-pointer text-xs font-medium shadow-md hover:bg-white"
+                className="absolute right-3 top-3 z-20 inline-flex min-h-11 items-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--card)] px-3 py-2 text-xs font-medium shadow-[var(--shadow-soft)]"
                 onClick={() => session.toggleFullscreenScore()}
                 aria-label="Sair da tela cheia"
               >
@@ -298,15 +308,15 @@ export default function StudyPage() {
               </button>
             ) : null}
 
-            <div className="flex flex-wrap items-center justify-between gap-3 px-3.5 py-2.5 border-b border-gray-300 flex-shrink-0">
+            <div className="flex flex-shrink-0 flex-wrap items-center justify-between gap-3 border-b border-[var(--border)] px-4 py-3">
               <div className="flex flex-wrap items-center gap-1.5 md:gap-2.5">
-                <span className="material-icons text-2xl text-primary" aria-hidden>
+                <span className="material-icons text-2xl text-[var(--primary)]" aria-hidden>
                   menu_book
                 </span>
-                <span className="font-medium text-gray-900">Partitura</span>
-                <span className="font-medium text-gray-900">{state.currentScoreName}</span>
+                <span className="font-medium">Partitura</span>
+                <span className="font-medium text-[var(--muted)]">{state.currentScoreName}</span>
                 {state.playbackPosition ? (
-                  <span className="text-xs font-medium text-primary bg-blue-100 px-2 py-1 rounded whitespace-nowrap" aria-live="polite">
+                  <span className="whitespace-nowrap rounded-full bg-[var(--accent)] px-2 py-1 text-xs font-medium text-[var(--foreground)]" aria-live="polite">
                     Compasso {state.playbackPosition.measure + 1}, tempo {state.playbackPosition.beat}
                   </span>
                 ) : null}
@@ -316,7 +326,7 @@ export default function StudyPage() {
                   <div className="flex flex-wrap gap-1.5">
                     <button
                       type="button"
-                      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white border border-gray-300 cursor-pointer text-xs font-medium hover:bg-gray-50"
+                      className="btn-outline-primary inline-flex min-h-11 items-center gap-1.5 text-xs"
                       onClick={() => session.openInstrumentSelection()}
                     >
                       <span className="material-icons text-base">tune</span>
@@ -324,7 +334,7 @@ export default function StudyPage() {
                     </button>
                     <button
                       type="button"
-                      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white border border-gray-300 cursor-pointer text-xs font-medium hover:bg-gray-50"
+                      className="btn-outline-primary inline-flex min-h-11 items-center gap-1.5 text-xs"
                       onClick={() => session.toggleFullscreenScore()}
                     >
                       <span className="material-icons text-base">
@@ -337,27 +347,27 @@ export default function StudyPage() {
                   </div>
                 ) : null}
                 <div className="text-sm">
-                  {state.scoreLoading ? <span className="text-gray-600">Carregando…</span> : null}
+                  {state.scoreLoading ? <span className="text-[var(--muted)]">Carregando…</span> : null}
                   {!state.scoreLoading && state.scoreError ? (
-                    <span className="text-red-700">{state.scoreError}</span>
+                    <span className="text-[var(--destructive)]">{state.scoreError}</span>
                   ) : null}
                   {!state.scoreLoading && !state.scoreError ? (
-                    <span className="text-green-700">{state.xmlLoaded ? 'Pronto' : 'Pendente'}</span>
+                    <span className="text-[var(--color-brand-strong)]">{state.xmlLoaded ? 'Pronto' : 'Pendente'}</span>
                   ) : null}
                 </div>
               </div>
             </div>
 
             <div className="flex-1 min-h-0 flex flex-col">
-              <div className="relative flex-1 min-h-52 max-h-[70vh] px-4 py-4 bg-gray-100 overflow-auto" ref={scoreContainerRef}>
+              <div className="relative max-h-[70vh] min-h-52 flex-1 overflow-auto bg-[var(--card-secondary)] px-4 py-4" ref={scoreContainerRef}>
                 {state.scoreLoading ? (
-                  <div className="absolute inset-0 z-5 flex flex-col items-center justify-center gap-4 bg-white/88 pointer-events-none">
+                  <div className="pointer-events-none absolute inset-0 z-5 flex flex-col items-center justify-center gap-4 bg-[var(--card)]/90">
                     <div className="flex flex-col gap-2.5 opacity-35" aria-hidden>
                       {Array.from({ length: 10 }).map((_, i) => (
-                        <div key={i} className="h-0.5 bg-gray-600 rounded-sm w-min(100%, 480px)" />
+                        <div key={i} className="h-0.5 w-min(100%, 480px) rounded-sm bg-[var(--muted)]" />
                       ))}
                     </div>
-                    <p className="m-0 font-medium text-gray-700">Carregando partitura…</p>
+                    <p className="m-0 font-medium text-[var(--foreground)]">Carregando partitura…</p>
                   </div>
                 ) : null}
                 {state.xmlLoaded && state.playbackCursorX != null ? (
@@ -373,14 +383,15 @@ export default function StudyPage() {
             </div>
           </section>
         ) : null}
+        </div>
 
         {state.fullscreenScore && state.isMobile && state.xmlLoaded ? (
           <>
             <div className="flex-shrink-0 h-20 pointer-events-none" aria-hidden />
-            <div className="fixed bottom-0 left-0 right-0 z-[1005] flex items-center justify-center gap-3 px-4 py-3 bg-white/96 border-t border-gray-300 shadow-lg" style={{ paddingBottom: `calc(12px + env(safe-area-inset-bottom, 0))` }}>
+            <div className="fixed bottom-0 left-0 right-0 z-[1005] flex items-center justify-center gap-3 border-t border-[var(--border)] bg-[var(--card)] px-4 py-3 shadow-[var(--shadow-soft)]" style={{ paddingBottom: `calc(12px + env(safe-area-inset-bottom, 0))` }}>
               <button
                 type="button"
-                className="w-14 h-14 rounded-full border-0 bg-primary text-white cursor-pointer inline-flex items-center justify-center shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex h-14 w-14 cursor-pointer items-center justify-center rounded-full border-0 bg-[var(--primary)] text-[var(--primary-foreground)] shadow-[var(--shadow-soft)] disabled:cursor-not-allowed disabled:opacity-50"
                 onClick={() => void session.play()}
                 disabled={state.loading}
                 aria-label="Play"
@@ -389,7 +400,7 @@ export default function StudyPage() {
               </button>
               <button
                 type="button"
-                className="inline-flex items-center justify-center w-10 h-10 rounded-full border-0 bg-transparent hover:bg-gray-200 cursor-pointer text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent text-[var(--foreground)] hover:bg-[var(--card-secondary)] disabled:cursor-not-allowed disabled:opacity-40"
                 onClick={() => session.pause()}
                 disabled={state.loading}
                 aria-label="Pausar"
@@ -398,7 +409,7 @@ export default function StudyPage() {
               </button>
               <button
                 type="button"
-                className="inline-flex items-center justify-center w-10 h-10 rounded-full border-0 bg-transparent hover:bg-gray-200 cursor-pointer text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent text-[var(--foreground)] hover:bg-[var(--card-secondary)] disabled:cursor-not-allowed disabled:opacity-40"
                 onClick={() => session.stop()}
                 disabled={state.loading}
                 aria-label="Parar"
@@ -412,12 +423,12 @@ export default function StudyPage() {
                 onClick={() => setMobileSheetOpen(false)}
                 aria-hidden
               />
-              <div className={`absolute left-0 right-0 bottom-0 max-h-[70vh] bg-white border-t-4 border-rounded-t-2xl shadow-2xl transform translate-y-full transition-transform flex flex-col min-h-0 ${mobileSheetOpen ? 'translate-y-0' : ''}`}>
-                <div className="flex items-center justify-between px-2 py-2 md:px-4 font-semibold border-b border-gray-300 flex-shrink-0">
+              <div className={`absolute bottom-0 left-0 right-0 flex max-h-[70vh] min-h-0 translate-y-full flex-col rounded-t-2xl border-t border-[var(--border)] bg-[var(--card)] shadow-[var(--shadow-soft)] transition-transform ${mobileSheetOpen ? 'translate-y-0' : ''}`}>
+                <div className="flex flex-shrink-0 items-center justify-between border-b border-[var(--border)] px-4 py-2 font-semibold">
                   <span>Controles</span>
                   <button
                     type="button"
-                    className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-transparent hover:bg-gray-200 cursor-pointer text-gray-700"
+                    className="inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-transparent text-[var(--foreground)] hover:bg-[var(--card-secondary)]"
                     onClick={() => setMobileSheetOpen(false)}
                     aria-label="Fechar"
                   >

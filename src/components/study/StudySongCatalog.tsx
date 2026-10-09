@@ -325,6 +325,7 @@ function InstrumentSelection({
   const selected = new Set(selectedIds);
   const allSelected =
     instruments.length > 0 && selectedIds.length === instruments.length;
+  const someSelected = selectedIds.length > 0 && !allSelected;
 
   return (
     <section className="rounded-xl border border-[var(--border)] p-4">
@@ -334,6 +335,9 @@ function InstrumentSelection({
         <input
           type="checkbox"
           checked={allSelected}
+          ref={(element) => {
+            if (element) element.indeterminate = someSelected;
+          }}
           onChange={(event) => onToggleAll(event.target.checked)}
         />
         Selecionar todos

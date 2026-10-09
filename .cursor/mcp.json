@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "browsermcp": {
+      "command": "/home/thomaz/.nvm/versions/node/v22.17.1/bin/node",
+      "args": [
+        "/home/thomaz/.nvm/versions/node/v22.17.1/lib/node_modules/npm/bin/npx-cli.js",
+        "-y",
+        "@browsermcp/mcp@latest"
+      ],
+      "env": {
+        "PATH": "/home/thomaz/.nvm/versions/node/v22.17.1/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      }
+    }
+  }
+}

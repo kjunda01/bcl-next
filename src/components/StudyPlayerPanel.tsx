@@ -55,15 +55,15 @@ export function StudyPlayerPanel({
   if (!state.playerReady) {
     return (
       <aside
-        className={`bg-white border border-gray-300 rounded-2xl shadow-sm flex flex-col overflow-hidden sticky top-3 z-3 h-fit gap-0 transition-all ${state.playerExpanded ? 'max-h-96' : 'max-h-14 overflow-hidden'}`}
+        className={`sticky top-3 z-3 flex h-fit flex-col gap-0 overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] text-[var(--foreground)] shadow-[var(--shadow-soft)] transition-all ${state.playerExpanded ? 'max-h-96' : 'max-h-14 overflow-hidden'}`}
       >
         {!mobileControlsOnly ? (
-          <div className="flex items-center justify-between flex-nowrap gap-2 px-3 py-2 min-h-10 bg-gray-100 font-semibold text-xs flex-shrink-0">
+          <div className="flex min-h-11 flex-shrink-0 flex-nowrap items-center justify-between gap-2 bg-[var(--card-secondary)] px-3 py-2 text-xs font-semibold">
             <span>Player</span>
           </div>
         ) : null}
         <div className="px-4 py-4 text-center">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-[var(--muted)]">
             {state.playerError ? 'Player indisponível.' : 'Preparando o player...'}
           </p>
         </div>
@@ -73,29 +73,29 @@ export function StudyPlayerPanel({
 
   return (
     <aside
-      className={`bg-white border border-gray-300 rounded-2xl shadow-sm flex flex-col overflow-hidden sticky top-3 z-3 h-fit gap-0 transition-all ${state.playerExpanded ? 'max-h-96' : 'max-h-14 overflow-hidden'}`}
+      className={`sticky top-3 z-3 flex h-fit flex-col gap-0 overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] text-[var(--foreground)] shadow-[var(--shadow-soft)] transition-all ${state.playerExpanded ? 'max-h-96' : 'max-h-14 overflow-hidden'}`}
     >
       {!mobileControlsOnly ? (
-        <div className="flex items-center justify-between flex-wrap gap-2 px-3 py-2 min-h-10 bg-gray-100 font-semibold text-xs flex-shrink-0">
+        <div className="flex min-h-11 flex-shrink-0 flex-wrap items-center justify-between gap-2 bg-[var(--card-secondary)] px-3 py-2 text-xs font-semibold">
           <div className="flex items-center gap-2 min-w-0">
-            <span className="material-icons text-xl text-primary" aria-hidden>
+            <span className="material-icons text-xl text-[var(--primary)]" aria-hidden>
               play_circle
             </span>
             <span>Player</span>
           </div>
           <div className="hidden md:flex items-center gap-1">
-            <button type="button" className={`inline-flex items-center justify-center w-9 h-9 rounded-full bg-transparent cursor-pointer ${disabledTransport ? 'opacity-40 cursor-not-allowed' : 'hover:bg-gray-200'} ${state.playerExpanded ? 'text-primary' : ''}`} onClick={onPlay} disabled={disabledTransport} aria-label="Play">
+            <button type="button" className={`inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-transparent ${disabledTransport ? 'cursor-not-allowed opacity-40' : 'hover:bg-[var(--secondary)]'} ${state.playerExpanded ? 'text-[var(--primary)]' : ''}`} onClick={onPlay} disabled={disabledTransport} aria-label="Play">
               <span className="material-icons">play_arrow</span>
             </button>
-            <button type="button" className={`inline-flex items-center justify-center w-9 h-9 rounded-full bg-transparent cursor-pointer ${disabledTransport ? 'opacity-40 cursor-not-allowed' : 'hover:bg-gray-200'}`} onClick={onPause} disabled={disabledTransport} aria-label="Pausar">
+            <button type="button" className={`inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-transparent ${disabledTransport ? 'cursor-not-allowed opacity-40' : 'hover:bg-[var(--secondary)]'}`} onClick={onPause} disabled={disabledTransport} aria-label="Pausar">
               <span className="material-icons">pause</span>
             </button>
-            <button type="button" className={`inline-flex items-center justify-center w-9 h-9 rounded-full bg-transparent cursor-pointer ${disabledTransport ? 'opacity-40 cursor-not-allowed' : 'hover:bg-gray-200'}`} onClick={onStop} disabled={disabledTransport} aria-label="Parar">
+            <button type="button" className={`inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-transparent ${disabledTransport ? 'cursor-not-allowed opacity-40' : 'hover:bg-[var(--secondary)]'}`} onClick={onStop} disabled={disabledTransport} aria-label="Parar">
               <span className="material-icons">stop</span>
             </button>
           </div>
           <div className="hidden md:flex items-center gap-2 flex-0 min-w-24 max-w-32">
-            <span className="material-icons text-base text-gray-600" aria-hidden>
+            <span className="material-icons text-base text-[var(--muted)]" aria-hidden>
               volume_up
             </span>
             <input
@@ -109,7 +109,7 @@ export function StudyPlayerPanel({
               className="flex-1 min-w-0"
             />
           </div>
-          <button type="button" className="border border-gray-300 bg-white cursor-pointer text-xs px-2.5 py-1 rounded-lg hover:bg-gray-50" onClick={onToggleExpanded}>
+          <button type="button" className="btn-outline-primary inline-flex min-h-11 items-center gap-1 text-xs" onClick={onToggleExpanded}>
             <span className="material-icons text-lg">
               {state.playerExpanded ? 'expand_less' : 'expand_more'}
             </span>
@@ -121,7 +121,7 @@ export function StudyPlayerPanel({
       <div className="flex flex-col gap-3 px-3 py-3">
         {state.playerLoading || !state.midiLoaded ? (
           <div className="px-3 py-4 text-center">
-            <p className="text-xs text-gray-600">
+            <p className="text-xs text-[var(--muted)]">
               {state.playerLoading
                 ? 'Preparando o player...'
                 : state.midiLoading
@@ -133,20 +133,20 @@ export function StudyPlayerPanel({
 
         {!mobileControlsOnly ? (
           <div className="flex items-center gap-2">
-            <button type="button" className={`inline-flex items-center justify-center w-9 h-9 rounded-full cursor-pointer ${disabledTransport ? 'opacity-40 cursor-not-allowed' : ''} text-primary hover:bg-gray-100`} onClick={onPlay} disabled={disabledTransport}>
+            <button type="button" className={`inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-full text-[var(--primary)] hover:bg-[var(--card-secondary)] ${disabledTransport ? 'cursor-not-allowed opacity-40' : ''}`} onClick={onPlay} disabled={disabledTransport}>
               <span className="material-icons">play_arrow</span>
             </button>
-            <button type="button" className={`inline-flex items-center justify-center w-9 h-9 rounded-full cursor-pointer ${disabledTransport ? 'opacity-40 cursor-not-allowed' : ''} hover:bg-gray-100`} onClick={onPause} disabled={disabledTransport}>
+            <button type="button" className={`inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-full hover:bg-[var(--card-secondary)] ${disabledTransport ? 'cursor-not-allowed opacity-40' : ''}`} onClick={onPause} disabled={disabledTransport}>
               <span className="material-icons">pause</span>
             </button>
-            <button type="button" className={`inline-flex items-center justify-center w-9 h-9 rounded-full cursor-pointer ${disabledTransport ? 'opacity-40 cursor-not-allowed' : ''} hover:bg-gray-100`} onClick={onStop} disabled={disabledTransport}>
+            <button type="button" className={`inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-full hover:bg-[var(--card-secondary)] ${disabledTransport ? 'cursor-not-allowed opacity-40' : ''}`} onClick={onStop} disabled={disabledTransport}>
               <span className="material-icons">stop</span>
             </button>
           </div>
         ) : null}
 
         <div>
-          <span className="hidden md:block text-xs font-medium text-gray-600 mb-1.5">Andamento</span>
+          <span className="hidden md:block text-xs font-medium text-[var(--muted)] mb-1.5">Andamento</span>
           <div className="flex items-center gap-2">
             <input
               type="range"
@@ -158,12 +158,12 @@ export function StudyPlayerPanel({
               disabled={state.playerLoading}
               className="flex-1 min-w-0"
             />
-            <span className="hidden md:inline text-xs font-medium text-gray-600 min-w-fit">{Math.round(state.bpm)} BPM</span>
+            <span className="hidden md:inline text-xs font-medium text-[var(--muted)] min-w-fit">{Math.round(state.bpm)} BPM</span>
           </div>
         </div>
 
         <div>
-          <span className="hidden md:block text-xs font-medium text-gray-600 mb-1.5">Volume</span>
+          <span className="hidden md:block text-xs font-medium text-[var(--muted)] mb-1.5">Volume</span>
           <div className="flex items-center gap-2">
             <input
               type="range"
@@ -175,26 +175,26 @@ export function StudyPlayerPanel({
               disabled={state.playerLoading}
               className="flex-1 min-w-0"
             />
-            <span className="hidden md:inline text-xs font-medium text-gray-600 min-w-fit">{Math.round(state.audioVolume * 100)}%</span>
+            <span className="hidden md:inline text-xs font-medium text-[var(--muted)] min-w-fit">{Math.round(state.audioVolume * 100)}%</span>
           </div>
         </div>
 
         <div>
-          <span className="hidden md:block text-xs font-medium text-gray-600 mb-1.5">Metrônomo</span>
+          <span className="hidden md:block text-xs font-medium text-[var(--muted)] mb-1.5">Metrônomo</span>
           <div className="flex flex-col gap-2">
             <button
               type="button"
-              className="px-3 py-2 rounded-lg border border-gray-300 bg-white font-medium text-xs cursor-pointer hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="btn-outline-primary min-h-11 text-xs disabled:cursor-not-allowed"
               onClick={onToggleMetronome}
               disabled={disabledTransport}
             >
               {state.metronomeEnabled ? 'Metrônomo ligado' : 'Metrônomo desligado'}
             </button>
-            <span className="hidden md:inline text-xs text-gray-600">
+            <span className="hidden md:inline text-xs text-[var(--muted)]">
               {state.timeSignature} · Base {Math.round(state.baseBpm)} BPM
             </span>
             <div className="flex items-center gap-2">
-              <span className="hidden md:inline text-xs font-medium text-gray-600">Volume</span>
+              <span className="hidden md:inline text-xs font-medium text-[var(--muted)]">Volume</span>
               <input
                 type="range"
                 min={0}
@@ -210,11 +210,11 @@ export function StudyPlayerPanel({
         </div>
 
         <div>
-          <span className="hidden md:block text-xs font-medium text-gray-600 mb-1.5">Loop</span>
+          <span className="hidden md:block text-xs font-medium text-[var(--muted)] mb-1.5">Loop</span>
           <div className="flex flex-col gap-2">
             <div className="flex flex-col md:flex-row gap-2">
               <label className="flex flex-col gap-1">
-                <span className="text-xs font-medium text-gray-600">Loop In (compasso)</span>
+                <span className="text-xs font-medium text-[var(--muted)]">Loop In (compasso)</span>
                 <input
                   type="number"
                   value={state.loopStartMeasure ?? ''}
@@ -222,11 +222,11 @@ export function StudyPlayerPanel({
                     const v = e.target.value;
                     onLoopStart(v === '' ? null : Number(v));
                   }}
-                  className="px-2 py-1.5 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary text-xs"
+                  className="text-xs"
                 />
               </label>
               <label className="flex flex-col gap-1">
-                <span className="text-xs font-medium text-gray-600">Loop Out (compasso)</span>
+                <span className="text-xs font-medium text-[var(--muted)]">Loop Out (compasso)</span>
                 <input
                   type="number"
                   value={state.loopEndMeasure ?? ''}
@@ -234,14 +234,14 @@ export function StudyPlayerPanel({
                     const v = e.target.value;
                     onLoopEnd(v === '' ? null : Number(v));
                   }}
-                  className="px-2 py-1.5 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary text-xs"
+                  className="text-xs"
                 />
               </label>
-              <button type="button" className="px-3 py-2 rounded-lg bg-primary text-white font-medium text-xs cursor-pointer hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed" onClick={onToggleLoop} disabled={state.playerLoading}>
+              <button type="button" className="btn-primary min-h-11 text-xs disabled:cursor-not-allowed" onClick={onToggleLoop} disabled={state.playerLoading}>
                 {state.loopEnabled ? 'Desativar Loop' : 'Ativar Loop'}
               </button>
             </div>
-            <div className="flex gap-4 text-xs text-gray-600">
+            <div className="flex gap-4 text-xs text-[var(--muted)]">
               <span>In: {state.loopStartMeasure ?? '-'}</span>
               <span>Out: {state.loopEndMeasure ?? '-'}</span>
             </div>
