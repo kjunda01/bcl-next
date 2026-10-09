@@ -343,6 +343,14 @@
   }
 }
 
+@layer components {
+  .score-container .study-osmd-host img[id^="cursorImg"] {
+    z-index: 30 !important;
+    pointer-events: none;
+    filter: drop-shadow(0 0 2px rgba(220, 38, 38, 0.85));
+  }
+}
+
 @layer base {
   html {
     min-height: 100%;

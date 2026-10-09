@@ -1,6 +1,12 @@
 import { OpenSheetMusicDisplay } from 'opensheetmusicdisplay';
-import { Player, VerovioConverter, type ISheetRenderer } from '@music-i18n/musicxml-player';
+import { Player, VerovioConverter } from '@music-i18n/musicxml-player';
+import { OsmdPlaybackRenderer } from './osmdPlaybackRenderer';
 import { StudyPlayerController } from './studyPlayerController';
+import {
+  getPlaybackPositionFromTimemap,
+  getPlayerPositionMs,
+  readPlayerTimemap,
+} from './studyTimemap';
 import {
   extractTempoInfoFromXml,
   extractInstrumentsFromXml,
@@ -15,29 +21,6 @@ import {
  */
 const VEROVIO_FONT_NOISE = ['default SMuFL glyphs', 'font could not be loaded'];
 
-/**
- * O Player exige um ISheetRenderer, mas quem desenha a partitura aqui é o OSMD.
- * Usar o VerovioRenderer faria uma segunda engravação completa num container
- * invisível a cada troca de instrumentos — custo alto no celular e sem uso.
- */
-class HeadlessSheetRenderer implements ISheetRenderer {
-  player?: Player;
-
-  destroy() {}
-
-  async initialize() {}
-
-  moveTo() {}
-
-  onResize() {}
-
-  onEvent() {}
-
-  get version() {
-    return 'headless';
-  }
-}
-
 export type StudyViewSnapshot = {
   scoreLoading: boolean;
   xmlLoaded: boolean;
@@ -46,6 +29,7 @@ export type StudyViewSnapshot = {
   fullscreenScore: boolean;
   isMobile: boolean;
   playbackPosition: { measure: number; beat: number; timeSignature: string } | null;
+  /** Reservado; o cursor visual é o nativo do OSMD. */
   playbackCursorX: number | null;
   loading: boolean;
   playerReady: boolean;
@@ -120,6 +104,7 @@ export class StudySession {
   private hiddenPlayerContainer: HTMLElement | null = null;
   private midiOnlyMode = false;
   private osmd: OpenSheetMusicDisplay | null = null;
+  private osmdPlaybackRenderer: OsmdPlaybackRenderer | null = null;
   private workletPatched = false;
   private scrollPatched = false;
 
@@ -130,11 +115,6 @@ export class StudySession {
   private cursorSyncTimer: number | null = null;
   private lastCursorMeasure = -1;
   private lastCursorBeat = -1;
-  private measureBoundsCache: Array<{ xStart: number; xEnd: number; yTop: number; yBottom: number }> = [];
-  private lastCursorX = 0;
-  private lastCursorY = 0;
-  private lastScrollIntoViewTime = 0;
-  private readonly scrollIntoViewThrottleMs = 150;
 
   private isPlaying = false;
   private tempo = 1.0;
@@ -264,24 +244,31 @@ export class StudySession {
   }
 
   updateMobile(isMobile: boolean) {
+    const changed = this.isMobile !== isMobile;
     this.isMobile = isMobile;
     this.emit();
+    if (changed && this.osmd && isMobile) {
+      this.fitScoreToViewport();
+      void this.osmd.render();
+    }
   }
 
   setFullscreenScore(v: boolean) {
     this.fullscreenScore = v;
-    this.measureBoundsCache = [];
-    requestAnimationFrame(() => {
-      const p = this.osmd?.render?.();
-      if (p && typeof (p as Promise<void>).then === 'function') {
-        void (p as Promise<void>)
-          .catch(() => {})
-          .finally(() => {
-            if (this.isPlaying) this.syncPlaybackCursor();
-          });
-      } else if (this.isPlaying) this.syncPlaybackCursor();
-    });
     this.emit();
+    requestAnimationFrame(() => {
+      this.fitScoreToViewport();
+      const p = this.osmd?.render?.();
+      const afterRender = () => {
+        this.osmdPlaybackRenderer?.onResize();
+        if (this.isPlaying) this.syncPlaybackCursor();
+      };
+      if (p && typeof (p as Promise<void>).then === 'function') {
+        void (p as Promise<void>).catch(() => {}).finally(afterRender);
+      } else {
+        afterRender();
+      }
+    });
   }
 
   toggleFullscreenScore() {
@@ -604,15 +591,28 @@ export class StudySession {
         return;
       }
       this.clearOsmdInner(mount);
+      const mobile = isMobileView();
+      if (mobile) {
+        this.isMobile = true;
+        this.fullscreenScore = true;
+        this.emit();
+        await this.waitNextFrame();
+        await this.waitNextFrame();
+      }
       this.osmd = new OpenSheetMusicDisplay(mount, {
         drawingParameters: 'default',
-        autoResize: true,
-        followCursor: true,
+        autoResize: !mobile,
+        followCursor: false,
+        pageFormat: mobile ? 'A4_P' : 'Endless',
+        cursorsOptions: [{ type: 1, color: '#dc2626', alpha: 0.95, follow: false }],
       });
       await this.osmd.load(xml);
+      this.fitScoreToViewport();
       await this.osmd.render();
-      this.measureBoundsCache = [];
-      this.osmd.enableOrDisableCursors?.(false);
+      await this.shrinkPageToContainer();
+      this.osmd.enableOrDisableCursors?.(true);
+      this.applyOsmdCursorStyle();
+      this.osmdPlaybackRenderer?.resetCursor();
       if (token === this.loadToken) {
         this.xmlLoaded = true;
         this.scoreLoading = false;
@@ -628,11 +628,38 @@ export class StudySession {
     this.emit();
   }
 
+  /** No celular, a página A4 é reduzida para a largura da tela. */
+  private fitScoreToViewport() {
+    if (!this.osmd || !isMobileView()) return;
+    const container = this.options.getScoreContainer() ?? this.options.getOsmdContainer();
+    const available = Math.max(240, (container?.clientWidth ?? window.innerWidth) - 8);
+    const pageWidth =
+      (this.osmd as { EngravingRules?: { PageFormat?: { width?: number } } }).EngravingRules
+        ?.PageFormat?.width ?? 210;
+    if (pageWidth <= 0) return;
+    const zoom = available / (pageWidth * 10);
+    (this.osmd as { Zoom: number }).Zoom = Math.max(0.15, Math.min(0.9, zoom));
+  }
+
+  private async shrinkPageToContainer() {
+    if (!this.osmd || !isMobileView()) return;
+    const mount = this.options.getOsmdContainer();
+    const container = this.options.getScoreContainer() ?? mount;
+    const svg = mount?.querySelector('svg');
+    if (!container || !svg) return;
+    const available = Math.max(240, container.clientWidth - 8);
+    const rendered = svg.getBoundingClientRect().width;
+    if (rendered <= available + 16 || rendered <= 0) return;
+    const current = this.osmd.Zoom > 0 ? this.osmd.Zoom : 1;
+    (this.osmd as { Zoom: number }).Zoom = Math.max(0.12, current * (available / rendered));
+    await this.osmd.render();
+  }
+
   private clearOsmdContainer() {
     this.stopCursorSync();
     this.lastCursorMeasure = -1;
     this.lastCursorBeat = -1;
-    this.measureBoundsCache = [];
+    this.osmdPlaybackRenderer?.resetCursor();
     try {
       this.osmd?.clear();
     } catch {
@@ -680,7 +707,13 @@ export class StudySession {
       if (token !== this.loadToken) return false;
       this.hiddenPlayerContainer = el;
       const converter = new VerovioConverter();
-      const renderer = new HeadlessSheetRenderer();
+      if (!this.osmdPlaybackRenderer) {
+        this.osmdPlaybackRenderer = new OsmdPlaybackRenderer(
+          () => this.osmd,
+          () => this.options.getScoreContainer(),
+        );
+      }
+      const renderer = this.osmdPlaybackRenderer;
       try {
         this.player = await Player.create({
           container: el,
@@ -890,8 +923,6 @@ export class StudySession {
       this.loopEndTs = null;
       return;
     }
-    const lastTs = timemap[timemap.length - 1]?.timestamp ?? 0;
-    const toMs = (t: number) => (lastTs > 0 && lastTs < 1000 ? t * 1000 : t);
     const startMeasure = this.loopStartMeasure - 1;
     const endMeasure = this.loopEndMeasure - 1;
     if (startMeasure < 0 || endMeasure < 0) {
@@ -901,9 +932,9 @@ export class StudySession {
     }
     const startEntry = timemap.find((t) => t.measure === startMeasure);
     const endEntry = timemap.find((t) => t.measure === endMeasure);
-    this.loopStartTs = startEntry?.timestamp != null ? toMs(startEntry.timestamp) : null;
-    const endStart = endEntry?.timestamp != null ? toMs(endEntry.timestamp) : null;
-    const endDur = endEntry?.duration != null ? toMs(endEntry.duration) : 0;
+    this.loopStartTs = startEntry?.timestamp ?? null;
+    const endStart = endEntry?.timestamp ?? null;
+    const endDur = endEntry?.duration ?? 0;
     this.loopEndTs = endStart != null ? endStart + endDur : null;
   }
 
@@ -930,15 +961,7 @@ export class StudySession {
   }
 
   private getPlayerPositionMs(): number | null {
-    const player = this.player as { position?: number; _options?: { converter?: { timemap?: { timestamp?: number }[] } } } | null;
-    if (!player || player.position == null) return null;
-    const pos = Number(player.position);
-    if (Number.isNaN(pos)) return null;
-    const timemap = player?._options?.converter?.timemap;
-    if (!Array.isArray(timemap) || timemap.length === 0) return pos > 1000 ? pos : pos * 1000;
-    const lastTs = timemap[timemap.length - 1]?.timestamp ?? 0;
-    const inSeconds = lastTs > 0 && lastTs < 1000;
-    return inSeconds ? pos * 1000 : pos;
+    return getPlayerPositionMs(this.player);
   }
 
   private getMoveToFromMeasureBeat(measure: number, beatInMeasure: number): {
@@ -946,20 +969,16 @@ export class StudySession {
     measureStartMs: number;
     measureOffsetMs: number;
   } | null {
-    const player = this.player as { _options?: { converter?: { timemap?: Array<{ timestamp?: number; duration?: number; measure?: number }> } } } | null;
-    const timemap = player?._options?.converter?.timemap;
-    if (!Array.isArray(timemap) || timemap.length === 0) return null;
+    const timemap = readPlayerTimemap(this.player);
+    if (!timemap) return null;
     const measureIndex = Math.max(0, measure - 1);
-    if (measureIndex >= timemap.length) return null;
-    const lastTs = timemap[timemap.length - 1]?.timestamp ?? 0;
-    const timemapInSeconds = lastTs > 0 && lastTs < 1000;
-    const toMs = (t: number) => (timemapInSeconds ? t * 1000 : t);
-    const entry = timemap[measureIndex];
+    const entry =
+      timemap.find((item) => item.measure === measureIndex) ?? timemap[measureIndex];
     if (!entry) return null;
-    const measureStartMs = toMs(entry.timestamp ?? 0);
-    let duration = entry.duration != null ? toMs(entry.duration) : 0;
+    const measureStartMs = entry.timestamp ?? 0;
+    let duration = entry.duration ?? 0;
     if (duration <= 0 && timemap[measureIndex + 1]) {
-      duration = toMs(timemap[measureIndex + 1].timestamp ?? 0) - measureStartMs;
+      duration = (timemap[measureIndex + 1].timestamp ?? 0) - measureStartMs;
     }
     const beats = Math.max(1, this.beatsPerMeasure);
     const beatDuration = duration > 0 ? duration / beats : 0;
@@ -967,203 +986,58 @@ export class StudySession {
     return { measureIndex, measureStartMs, measureOffsetMs };
   }
 
-  private getCurrentMeasureAndBeat(): {
-    measure: number;
-    beatInMeasure: number;
-    fractionInMeasure: number;
-  } | null {
-    const posMs = this.getPlayerPositionMs();
-    if (posMs == null) return null;
-    const player = this.player as { _options?: { converter?: { timemap?: Array<{ timestamp?: number; duration?: number; measure?: number }> } } } | null;
-    const timemap = player?._options?.converter?.timemap;
-    if (!Array.isArray(timemap) || timemap.length === 0) return null;
-    const lastTs = timemap[timemap.length - 1]?.timestamp ?? 0;
-    const timemapInSeconds = lastTs > 0 && lastTs < 1000;
-    const toMs = (t: number) => (timemapInSeconds ? t * 1000 : t);
-    const beats = Math.max(1, this.beatsPerMeasure);
-    let index = 0;
-    for (let i = 0; i < timemap.length - 1; i++) {
-      const start = toMs(timemap[i]?.timestamp ?? 0);
-      const nextStart = toMs(timemap[i + 1]?.timestamp ?? Infinity);
-      if (posMs >= start && posMs < nextStart) {
-        index = i;
-        break;
-      }
-      if (posMs < start) {
-        index = Math.max(0, i - 1);
-        break;
-      }
-      index = i;
-    }
-    const entry = timemap[index];
-    if (!entry) return null;
-    const measureStart = toMs(entry.timestamp ?? 0);
-    let duration = entry.duration != null ? toMs(entry.duration) : 0;
-    if (duration <= 0 && timemap[index + 1]) {
-      duration = toMs(timemap[index + 1].timestamp ?? 0) - measureStart;
-    }
-    const measureNum = typeof entry.measure === 'number' ? entry.measure + 1 : index + 1;
-    if (duration <= 0) {
-      return { measure: measureNum, beatInMeasure: 0, fractionInMeasure: 0 };
-    }
-    const beatDuration = duration / beats;
-    const beatInMeasure = Math.min(
-      beats - 1,
-      Math.max(0, Math.floor((posMs - measureStart) / beatDuration))
-    );
-    const fractionInMeasure = Math.max(0, Math.min(1, (posMs - measureStart) / duration));
-    return { measure: measureNum, beatInMeasure, fractionInMeasure };
-  }
-
-  private getMeasureBoundsFromOsmd(measureIndex: number): {
-    xStart: number;
-    xEnd: number;
-    yTop: number;
-    yBottom: number;
-  } | null {
-    if (measureIndex < 0 || !this.osmd) return null;
-    const cached = this.measureBoundsCache[measureIndex];
-    if (cached) return cached;
-    const osmdAny = this.osmd as unknown as Record<string, unknown>;
-    const graphic = (osmdAny['GraphicSheet'] ?? osmdAny['graphic']) as
-      | { findGraphicalMeasure?: (mi: number, si: number) => unknown }
-      | undefined;
-    if (!graphic?.findGraphicalMeasure) return null;
+  private applyOsmdCursorStyle() {
+    if (!this.osmd) return;
     try {
-      const graphicAny = graphic as { systems?: { length: number } };
-      const systemsCount =
-        typeof graphicAny?.systems?.length === 'number' ? graphicAny.systems.length : 6;
-      const maxSystems = Math.max(1, Math.min(20, systemsCount));
-      let gMeasure: Record<string, unknown> | null | undefined;
-      for (let si = 0; si < maxSystems; si++) {
-        gMeasure = graphic.findGraphicalMeasure(measureIndex, si) as Record<string, unknown> | null | undefined;
-        if (gMeasure) break;
-      }
-      if (!gMeasure) return null;
-      const pos = (gMeasure['PositionAndShape'] ??
-        gMeasure['positionAndShape'] ??
-        gMeasure['boundingBox']) as {
-        AbsolutePosition?: { x: number; y: number };
-        absolutePosition?: { x: number; y: number };
-        Size?: { width: number; height: number };
-        size?: { width: number; height: number };
-      } | undefined;
-      if (!pos) return null;
-      const ap = pos.AbsolutePosition ?? pos.absolutePosition;
-      const sz = pos.Size ?? pos.size;
-      const ax = ap?.x ?? 0;
-      const ay = ap?.y ?? 0;
-      const w = sz?.width ?? 0;
-      const h = sz?.height ?? 0;
-      const bounds = { xStart: ax, xEnd: ax + w, yTop: ay, yBottom: ay + h };
-      this.measureBoundsCache[measureIndex] = bounds;
-      return bounds;
-    } catch {
-      return null;
-    }
-  }
-
-  private getCursorPointFromPosition(): { x: number; y: number } | null {
-    const pos = this.getCurrentMeasureAndBeat();
-    if (!pos) return null;
-    const container = this.options.getScoreContainer();
-    if (!container) return null;
-    const player = this.player as { _options?: { converter?: { timemap?: unknown[] } } } | null;
-    const timemap = player?._options?.converter?.timemap;
-    const numMeasures = Math.max(1, Array.isArray(timemap) ? timemap.length : 1);
-    const measureIndex = pos.measure - 1;
-    const fraction = Math.max(0, Math.min(1, pos.fractionInMeasure));
-    const bounds = this.getMeasureBoundsFromOsmd(measureIndex);
-    if (bounds && bounds.xEnd - bounds.xStart > 0) {
-      const xOsmd = bounds.xStart + fraction * (bounds.xEnd - bounds.xStart);
-      const yOsmd = (bounds.yTop + bounds.yBottom) / 2;
-      const svg = container.querySelector('svg');
-      const viewBoxRaw = svg?.getAttribute('viewBox') ?? '';
-      const parts = viewBoxRaw.split(/\s+/).map((n) => Number(n));
-      if (svg && parts.length === 4 && parts.every((n) => Number.isFinite(n))) {
-        const [minX, minY, vbW, vbH] = parts;
-        const scaleX = vbW > 0 ? svg.clientWidth / vbW : 1;
-        const scaleY = vbH > 0 ? svg.clientHeight / vbH : scaleX;
-        const svgRect = svg.getBoundingClientRect();
-        const containerRect = container.getBoundingClientRect();
-        const xPx = (xOsmd - minX) * scaleX + (svgRect.left - containerRect.left) + container.scrollLeft;
-        const yPx = (yOsmd - minY) * scaleY + (svgRect.top - containerRect.top) + container.scrollTop;
-        return { x: xPx, y: yPx };
-      }
-    }
-    const progress = (measureIndex + fraction) / numMeasures;
-    return {
-      x: progress * container.scrollWidth,
-      y: container.scrollTop + container.clientHeight / 2,
-    };
-  }
-
-  private syncPlaybackCursor() {
-    const pos = this.getCurrentMeasureAndBeat();
-    if (pos) {
-      this.lastCursorMeasure = pos.measure;
-      this.lastCursorBeat = pos.beatInMeasure;
-      this.playbackPosition = {
-        measure: pos.measure,
-        beat: pos.beatInMeasure + 1,
-        timeSignature: this.timeSignature,
+      this.osmd.cursor.CursorOptions = {
+        ...this.osmd.cursor.CursorOptions,
+        type: 1,
+        color: '#dc2626',
+        alpha: 0.95,
+        follow: false,
       };
-    }
-    const container = this.options.getScoreContainer();
-    const point = this.getCursorPointFromPosition();
-    if (point && Number.isFinite(point.x)) {
-      const scrollWidth = container?.scrollWidth ?? 0;
-      const maxX = Math.max(0, scrollWidth - 4);
-      this.lastCursorX = Math.max(0, Math.min(maxX, point.x));
-      if (Number.isFinite(point.y)) this.lastCursorY = point.y;
-    }
-    this.playbackCursorX = this.lastCursorX;
-    this.scrollCursorIntoView(this.lastCursorX, this.lastCursorY);
-    this.emit();
-  }
-
-  private scrollCursorIntoView(cursorX: number, cursorY: number) {
-    const container = this.options.getScoreContainer();
-    if (!container) return;
-    const now = Date.now();
-    if (now - this.lastScrollIntoViewTime < this.scrollIntoViewThrottleMs) return;
-    this.lastScrollIntoViewTime = now;
-    try {
-      const cw = container.clientWidth;
-      const sw = container.scrollWidth;
-      if (sw > cw && Number.isFinite(cursorX)) {
-        const targetScrollLeft = Math.max(0, cursorX - cw / 2);
-        const maxScrollLeft = sw - cw;
-        const clampedLeft = Math.max(0, Math.min(targetScrollLeft, maxScrollLeft));
-        if (Math.abs(container.scrollLeft - clampedLeft) > 2) {
-          container.scrollTo({ left: clampedLeft, behavior: 'smooth' });
-        }
-      }
-      const targetScrollTop = cursorY - container.clientHeight / 2;
-      const maxScrollTop = Math.max(0, container.scrollHeight - container.clientHeight);
-      const clampedTop = Math.max(0, Math.min(targetScrollTop, maxScrollTop));
-      if (Math.abs(container.scrollTop - clampedTop) > 2) {
-        container.scrollTo({ top: clampedTop, behavior: 'smooth' });
-      }
+      const cursorEl = this.osmd.cursor.cursorElement;
+      if (cursorEl) cursorEl.style.zIndex = '30';
     } catch {
       /* ignore */
     }
   }
 
-  private startCursorSync() {
-    if (this.cursorSyncTimer) return;
-    this.cursorSyncTimer = window.setInterval(() => this.syncPlaybackCursor(), 30);
+  /** Atualiza o rótulo “Compasso X, tempo Y” (a linha visual vem do cursor do OSMD via moveTo). */
+  private syncPlaybackCursor() {
+    const posMs = this.getPlayerPositionMs();
+    const timemap = readPlayerTimemap(this.player);
+    if (posMs == null || !timemap) return;
+    const pos = getPlaybackPositionFromTimemap(timemap, posMs, this.beatsPerMeasure);
+    if (!pos) return;
+    this.lastCursorMeasure = pos.measure;
+    this.lastCursorBeat = pos.beatInMeasure;
+    this.playbackPosition = {
+      measure: pos.measure,
+      beat: pos.beat,
+      timeSignature: this.timeSignature,
+    };
+    this.playbackCursorX = null;
+    this.emit();
   }
 
-  private stopCursorSync() {
+  private startCursorSync() {
+    if (this.cursorSyncTimer) return;
+    this.cursorSyncTimer = window.setInterval(() => this.syncPlaybackCursor(), 50);
+  }
+
+  private stopCursorSyncTimer() {
     if (this.cursorSyncTimer) {
       window.clearInterval(this.cursorSyncTimer);
       this.cursorSyncTimer = null;
     }
+  }
+
+  private stopCursorSync() {
+    this.stopCursorSyncTimer();
     this.playbackPosition = null;
     this.playbackCursorX = null;
-    this.lastCursorX = 0;
-    this.lastCursorY = 0;
+    this.osmdPlaybackRenderer?.resetCursor();
     this.emit();
   }
 
@@ -1172,7 +1046,7 @@ export class StudySession {
     p?.pause?.();
     this.isPlaying = false;
     this.stopLoopMonitor();
-    this.stopCursorSync();
+    this.stopCursorSyncTimer();
     this.playerController.stopMetronome();
     this.emit();
   }

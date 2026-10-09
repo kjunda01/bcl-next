@@ -294,7 +294,7 @@ export default function StudyPage() {
 
         {showScoreBlock ? (
           <section className={`flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] shadow-[var(--shadow-soft)] ${state.fullscreenScore ? 'min-h-0 flex-1 rounded-none border-0 shadow-none' : ''}`}>
-            {state.fullscreenScore ? (
+            {state.fullscreenScore && !state.isMobile ? (
               <button
                 type="button"
                 className="absolute right-3 top-3 z-20 inline-flex min-h-11 items-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--card)] px-3 py-2 text-xs font-medium shadow-[var(--shadow-soft)]"
@@ -308,7 +308,7 @@ export default function StudyPage() {
               </button>
             ) : null}
 
-            <div className="flex flex-shrink-0 flex-wrap items-center justify-between gap-3 border-b border-[var(--border)] px-4 py-3">
+            <div className={`flex flex-shrink-0 flex-wrap items-center justify-between gap-3 border-b border-[var(--border)] px-4 py-3 ${state.fullscreenScore && state.isMobile ? 'hidden' : ''}`}>
               <div className="flex flex-wrap items-center gap-1.5 md:gap-2.5">
                 <span className="material-icons text-2xl text-[var(--primary)]" aria-hidden>
                   menu_book
@@ -317,7 +317,7 @@ export default function StudyPage() {
                 <span className="font-medium text-[var(--muted)]">{state.currentScoreName}</span>
                 {state.playbackPosition ? (
                   <span className="whitespace-nowrap rounded-full bg-[var(--accent)] px-2 py-1 text-xs font-medium text-[var(--foreground)]" aria-live="polite">
-                    Compasso {state.playbackPosition.measure + 1}, tempo {state.playbackPosition.beat}
+                    Compasso {state.playbackPosition.measure}, tempo {state.playbackPosition.beat}
                   </span>
                 ) : null}
               </div>
@@ -359,7 +359,10 @@ export default function StudyPage() {
             </div>
 
             <div className="flex-1 min-h-0 flex flex-col">
-              <div className="relative max-h-[70vh] min-h-52 flex-1 overflow-auto bg-[var(--card-secondary)] px-4 py-4" ref={scoreContainerRef}>
+              <div
+                className={`score-container relative min-h-0 flex-1 overflow-auto bg-[var(--card-secondary)] ${state.fullscreenScore && state.isMobile ? 'max-h-none px-1 py-2' : 'max-h-[70vh] min-h-52 px-4 py-4'}`}
+                ref={scoreContainerRef}
+              >
                 {state.scoreLoading ? (
                   <div className="pointer-events-none absolute inset-0 z-5 flex flex-col items-center justify-center gap-4 bg-[var(--card)]/90">
                     <div className="flex flex-col gap-2.5 opacity-35" aria-hidden>
@@ -370,15 +373,7 @@ export default function StudyPage() {
                     <p className="m-0 font-medium text-[var(--foreground)]">Carregando partitura…</p>
                   </div>
                 ) : null}
-                {state.xmlLoaded && state.playbackCursorX != null ? (
-                  <div className="absolute inset-0 pointer-events-none z-10" aria-hidden>
-                    <div
-                      className="absolute top-0 bottom-0 w-1.25 bg-red-600 rounded-sm shadow-lg"
-                      style={{ left: state.playbackCursorX }}
-                    />
-                  </div>
-                ) : null}
-                <div ref={osmdContainerRef} className="min-h-52" />
+                <div ref={osmdContainerRef} className="relative min-h-52 study-osmd-host" />
               </div>
             </div>
           </section>

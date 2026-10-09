@@ -1,3 +1,9 @@
+import {
+  findTimemapIndexAtPosition,
+  getPlayerPositionMs,
+  readPlayerTimemap,
+} from './studyTimemap';
+
 export class StudyPlayerController {
   player: unknown = null;
   metronomeEnabled = false;
@@ -96,31 +102,7 @@ export class StudyPlayerController {
   }
 
   private getPlayerPositionMs(): number | null {
-    const pos = (this.player as { position?: number })?.position;
-    if (pos == null || Number.isNaN(pos)) return null;
-    const timemap = (this.player as { _options?: { converter?: { timemap?: unknown } } })?._options?.converter?.timemap;
-    if (!Array.isArray(timemap) || timemap.length === 0) {
-      return pos > 1000 ? pos : pos * 1000;
-    }
-    const last = (timemap as { timestamp?: number }[])[timemap.length - 1];
-    const lastTs = last?.timestamp ?? 0;
-    const isMs = lastTs > 1000 || pos > 1000;
-    return isMs ? pos : pos * 1000;
-  }
-
-  private timemapToMs(timemap: Array<{ timestamp?: number; duration?: number }>): Array<{ startMs: number; durationMs: number }> {
-    if (!timemap?.length) return [];
-    const lastTs = timemap[timemap.length - 1]?.timestamp ?? 0;
-    const inSeconds = lastTs > 0 && lastTs < 1000;
-    const toMs = (t: number) => (inSeconds ? t * 1000 : t);
-    return timemap.map((entry, i) => {
-      const startMs = toMs(entry.timestamp ?? 0);
-      let durationMs = entry.duration != null ? toMs(entry.duration) : 0;
-      if (durationMs <= 0 && timemap[i + 1]) {
-        durationMs = toMs(timemap[i + 1].timestamp ?? 0) - startMs;
-      }
-      return { startMs, durationMs };
-    });
+    return getPlayerPositionMs(this.player);
   }
 
   private getBeatIndexFromTimemap(posMs: number, beatsPerMeasure: number): {
@@ -128,45 +110,34 @@ export class StudyPlayerController {
     beatInMeasure: number;
     measureIndex: number;
   } | null {
-    const rawTimemap = (this.player as { _options?: { converter?: { timemap?: unknown } } })?._options?.converter?.timemap;
-    if (!Array.isArray(rawTimemap) || rawTimemap.length === 0) return null;
-    const timemapMs = this.timemapToMs(rawTimemap as { timestamp?: number; duration?: number }[]);
+    const timemap = readPlayerTimemap(this.player);
+    if (!timemap) return null;
     const beats = Math.max(1, beatsPerMeasure);
 
     let index = this.metronomeLastMeasureIndex ?? 0;
-    if (index >= timemapMs.length) index = 0;
+    if (index >= timemap.length) index = 0;
 
-    const pos = posMs;
     const forward =
-      index < timemapMs.length - 1 &&
-      pos >= timemapMs[index + 1].startMs;
-    const backward = index < timemapMs.length && pos < timemapMs[index].startMs;
+      index < timemap.length - 1 && posMs >= (timemap[index + 1]?.timestamp ?? Infinity);
+    const backward = index < timemap.length && posMs < (timemap[index]?.timestamp ?? 0);
 
     if (forward || backward) {
-      index = 0;
-      for (let i = 0; i < timemapMs.length - 1; i++) {
-        const start = timemapMs[i].startMs;
-        const nextStart = timemapMs[i + 1].startMs;
-        if (pos >= start && pos < nextStart) {
-          index = i;
-          break;
-        }
-        if (pos < start) {
-          index = Math.max(0, i - 1);
-          break;
-        }
-      }
-      if (index >= timemapMs.length) index = timemapMs.length - 1;
+      index = findTimemapIndexAtPosition(timemap, posMs);
     }
 
-    const current = timemapMs[index];
-    if (!current || current.durationMs <= 0) return null;
+    const current = timemap[index];
+    if (!current) return null;
+    const measureStart = current.timestamp ?? 0;
+    let durationMs = current.duration ?? 0;
+    if (durationMs <= 0 && timemap[index + 1]) {
+      durationMs = (timemap[index + 1].timestamp ?? 0) - measureStart;
+    }
+    if (durationMs <= 0) return null;
 
-    const measureStart = current.startMs;
-    const beatDuration = current.durationMs / beats;
+    const beatDuration = durationMs / beats;
     const beatInMeasure = Math.min(
       beats - 1,
-      Math.max(0, Math.floor((pos - measureStart) / beatDuration))
+      Math.max(0, Math.floor((posMs - measureStart) / beatDuration)),
     );
     const globalBeat = index * beats + beatInMeasure;
     return { globalBeat, beatInMeasure, measureIndex: index };
