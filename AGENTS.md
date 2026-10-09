@@ -29,7 +29,7 @@ Fluxo oficial: **App Router** (`src/app/**`).
 | `src/core/auth/` | Papéis, permissões, máscara |
 | `src/core/theme/tokens.css` | Cores, tipo, raios — não espalhar hex solto |
 | `src/components/domain/` | Workspace genérico de gestão |
-| `src/pages/Study/` + `src/study/` | Sessão de estudo (client-only; OSMD/player usam `window`) |
+| `src/study/` (incl. `StudyPage.tsx`) | Sessão de estudo (client-only; OSMD/player usam `window`) |
 | `src/lib/api.ts` | HTTP da API (`NEXT_PUBLIC_API_URL`, fallback `http://localhost:3001`) |
 
 Não recriar `/students`, `src/legacy-pages` nem CRUD paralelo. IDs de registro: **só a API** (não `crypto.randomUUID()` no POST).

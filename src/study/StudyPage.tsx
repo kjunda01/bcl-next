@@ -1,12 +1,14 @@
+'use client';
+
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { getApiUrl } from '../../config/environment';
-import { useStudySession } from '../../study/useStudySession';
-import { StudyInstrumentPanel } from '../../components/StudyInstrumentPanel';
-import { StudyPlayerPanel } from '../../components/StudyPlayerPanel';
+import { getApiUrl } from '@/config/environment';
+import { useStudySession } from '@/study/useStudySession';
+import { StudyInstrumentPanel } from '@/components/StudyInstrumentPanel';
+import { StudyPlayerPanel } from '@/components/StudyPlayerPanel';
 import {
   StudySongCatalog,
   type StudyStartOptions,
-} from '../../components/study/StudySongCatalog';
+} from '@/components/study/StudySongCatalog';
 
 export default function StudyPage() {
   const apiUrl = getApiUrl();

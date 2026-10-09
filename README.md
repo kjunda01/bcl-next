@@ -178,7 +178,7 @@ Tema claro/escuro: `src/contexts/ThemeContext.tsx` e a página `/settings`.
     ├── hooks/                   # CRUD genérico
     ├── layouts/                 # PublicShell, AppShell, RootShell
     ├── lib/                     # cliente HTTP
-    ├── pages/Study/             # tela da sessão de estudo
+    ├── study/StudyPage.tsx       # tela da sessão de estudo (client-only)
     └── study/                   # player de partituras
 ```
 

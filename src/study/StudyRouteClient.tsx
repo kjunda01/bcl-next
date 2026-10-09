@@ -1,6 +1,6 @@
 'use client';
 
-import StudyPage from '@/pages/Study/StudyPage';
+import StudyPage from '@/study/StudyPage';
 
 export default function StudyRouteClient() {
   return <StudyPage />;
