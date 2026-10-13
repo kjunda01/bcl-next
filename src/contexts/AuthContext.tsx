@@ -88,6 +88,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const loginAs = useCallback(async (role: AuthenticatedRole, keepLoggedIn: boolean) => {
+    if (role === 'admin' || role === 'maestro') {
+      throw new Error('Administrador e maestro entram com e-mail e senha.');
+    }
     const found = demoUserByRole(role);
     setUser(found);
     persist(found, keepLoggedIn);

@@ -9,7 +9,7 @@ export default function LoginPage() {
   const auth = useAuth();
   const router = useRouter();
   const [email, setEmail] = useState('admin@bcl.local');
-  const [password, setPassword] = useState('admin');
+  const [password, setPassword] = useState('');
   const [keep, setKeep] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,7 +32,7 @@ export default function LoginPage() {
         <p className="text-xs uppercase tracking-[0.2em] text-[var(--muted)]">Acesso interno</p>
         <h1 className="mt-2 text-3xl font-semibold">Entrar</h1>
         <p className="mt-2 text-sm text-[var(--muted)]">
-          Login simulado. Use um perfil de demonstração para ver as regras de permissão.
+          Administrador e maestro entram com e-mail e senha. Aluno e músico podem usar o acesso rápido.
         </p>
 
         <form className="mt-8 flex flex-col gap-4" onSubmit={onSubmit}>
@@ -57,7 +57,7 @@ export default function LoginPage() {
         <div className="mt-8">
           <p className="text-xs uppercase tracking-[0.2em] text-[var(--muted)]">Acesso rápido</p>
           <div className="mt-3 grid grid-cols-2 gap-2">
-            {AUTHENTICATED_ROLES.map((role) => (
+            {AUTHENTICATED_ROLES.filter((role) => role !== 'admin' && role !== 'maestro').map((role) => (
               <button
                 key={role}
                 type="button"

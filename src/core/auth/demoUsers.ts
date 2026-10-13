@@ -1,6 +1,9 @@
 import type { AppUser } from '@/domains/users/types';
 import type { AuthenticatedRole } from './roles';
 
+/** Senha provisória até existir login real. Só administrador e maestro. */
+const PRIVILEGED_PASSWORD = '#bcl.2026@';
+
 export const DEMO_USERS: Array<AppUser & { password: string }> = [
   {
     id: 'user-admin',
@@ -8,7 +11,7 @@ export const DEMO_USERS: Array<AppUser & { password: string }> = [
     name: 'Ana Admin',
     roles: ['admin'],
     isActive: true,
-    password: 'admin',
+    password: PRIVILEGED_PASSWORD,
     createdAt: '2024-01-10T10:00:00.000Z',
     updatedAt: '2024-01-10T10:00:00.000Z',
   },
@@ -19,7 +22,7 @@ export const DEMO_USERS: Array<AppUser & { password: string }> = [
     roles: ['maestro'],
     personId: 'person-maestro',
     isActive: true,
-    password: 'maestro',
+    password: PRIVILEGED_PASSWORD,
     createdAt: '2024-01-10T10:00:00.000Z',
     updatedAt: '2024-01-10T10:00:00.000Z',
   },

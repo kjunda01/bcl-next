@@ -10,6 +10,8 @@ import { apiFetch } from '@/lib/api';
 import { formatPublishedDate, mediaKindLabel } from '@/lib/publicPortal';
 import type { MediaPost } from '@/domains/media/types';
 
+const postShellClass = 'mx-auto w-[85%] py-16';
+
 export default function BlogPostPage() {
   const params = useParams<{ slug: string }>();
   const [post, setPost] = useState<MediaPost | null | undefined>(undefined);
@@ -25,7 +27,7 @@ export default function BlogPostPage() {
 
   if (post === undefined) {
     return (
-      <div className="mx-auto w-[85%] py-16">
+      <div className={postShellClass}>
         <p className="text-[var(--muted)]">Carregando…</p>
       </div>
     );
@@ -33,7 +35,7 @@ export default function BlogPostPage() {
 
   if (!post) {
     return (
-      <div className="mx-auto w-[85%] py-16">
+      <div className={postShellClass}>
         <h1 className="text-2xl font-semibold">Conteúdo não encontrado</h1>
         <Link href="/blog" className="mt-4 inline-flex min-h-11 items-center text-[var(--color-brand-strong)]">
           Voltar ao blog
@@ -64,9 +66,15 @@ export default function BlogPostPage() {
       {post.excerpt ? <p className="mt-4 text-lg leading-relaxed text-[var(--muted)]">{post.excerpt}</p> : null}
 
       {post.coverUrl ? (
-        <div className="relative mt-8 aspect-[16/10] overflow-hidden rounded-2xl shadow-[var(--shadow-soft)]">
-          <Image src={post.coverUrl} alt="" fill className="object-cover" sizes="85vw" priority />
-        </div>
+        <Image
+          src={post.coverUrl}
+          alt=""
+          width={1200}
+          height={800}
+          className="mx-auto mt-8 h-auto max-h-[28rem] w-auto max-w-full rounded-2xl shadow-[var(--shadow-soft)] sm:max-w-4xl"
+          sizes="(max-width: 768px) 85vw, 896px"
+          priority
+        />
       ) : null}
 
       <PostBlocks blocks={readBlocks(post)} />

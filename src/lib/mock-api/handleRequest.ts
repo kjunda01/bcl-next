@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto';
-import { getCollection, isMockCollection } from './store';
+import { getCollection, isMockCollection, persistMockDb } from './store';
 import type { MockCollection, MockRecord } from './types';
 
 function jsonResponse(body: unknown, status = 200): Response {
@@ -60,6 +60,7 @@ export async function handleMockApiRequest(
       id: typeof body.id === 'string' && body.id.trim() ? body.id.trim() : nextId(collection),
     };
     getCollection(collection).push(record);
+    await persistMockDb();
     return jsonResponse(record, 201);
   }
 
@@ -79,6 +80,7 @@ export async function handleMockApiRequest(
       id,
     };
     rows[index] = updated;
+    await persistMockDb();
     return jsonResponse(updated);
   }
 
@@ -87,6 +89,7 @@ export async function handleMockApiRequest(
     const index = findIndex(collection, id);
     if (index < 0) return notFound();
     rows.splice(index, 1);
+    await persistMockDb();
     return jsonResponse({});
   }
 

@@ -1,27 +1,37 @@
-import seed from '../../../db.json';
-import type { MockCollection, MockDb, MockRecord } from './types';
+import { readFileSync } from 'node:fs';
+import { writeFile } from 'node:fs/promises';
+import path from 'node:path';
+import { MOCK_COLLECTIONS, type MockCollection, type MockDb, type MockRecord } from './types';
+
+const seedPath = path.join(process.cwd(), 'src/domains/seed/mock-api.json');
 
 const globalStore = globalThis as typeof globalThis & {
   __bclMockDb?: MockDb;
 };
 
-function cloneSeed(): MockDb {
-  return structuredClone(seed) as MockDb;
+function readSeedFile(): MockDb {
+  return JSON.parse(readFileSync(seedPath, 'utf8')) as MockDb;
 }
 
-/** Banco em memória (persiste enquanto a instância serverless estiver quente). */
+/** Banco em memória. Na primeira leitura, carrega o mock-api.json. */
 export function getMockDb(): MockDb {
   if (!globalStore.__bclMockDb) {
-    globalStore.__bclMockDb = cloneSeed();
-  } else {
-    if (!Array.isArray(globalStore.__bclMockDb.homepage)) {
-      globalStore.__bclMockDb.homepage = structuredClone(seed.homepage);
-    }
-    if (!Array.isArray(globalStore.__bclMockDb.blogpage)) {
-      globalStore.__bclMockDb.blogpage = structuredClone(seed.blogpage);
-    }
+    globalStore.__bclMockDb = readSeedFile();
   }
   return globalStore.__bclMockDb;
+}
+
+let writeChain = Promise.resolve();
+
+/** Grava o estado atual no seed para a alteração da tela permanecer no arquivo. */
+export function persistMockDb(): Promise<void> {
+  const body = `${JSON.stringify(getMockDb(), null, 2)}\n`;
+  const task = writeChain.then(() => writeFile(seedPath, body, 'utf8'));
+  writeChain = task.then(
+    () => undefined,
+    () => undefined,
+  );
+  return task;
 }
 
 export function getCollection(name: MockCollection): MockRecord[] {
@@ -34,5 +44,5 @@ export function getCollection(name: MockCollection): MockRecord[] {
 }
 
 export function isMockCollection(name: string): name is MockCollection {
-  return name in seed;
+  return (MOCK_COLLECTIONS as string[]).includes(name);
 }

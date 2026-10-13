@@ -63,8 +63,8 @@ export function AlbumBlock({ images, layout, caption }: AlbumBlockProps) {
             setPaused(false);
           }}
         >
-          <div className="overflow-hidden rounded-2xl bg-black shadow-[var(--shadow-soft)]">
-            <div className="relative aspect-[16/10]">
+          <div className="mx-auto w-full max-w-4xl overflow-hidden rounded-2xl bg-black shadow-[var(--shadow-soft)]">
+            <div className="relative aspect-video">
               <CarouselTrack photos={photos} index={Math.min(index, photos.length - 1)} direction={direction} onSwipe={showNext} onSwipeBack={showPrevious} />
               <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/75 to-transparent" />
               {photos.length > 1 ? (
@@ -125,8 +125,8 @@ export function AlbumBlock({ images, layout, caption }: AlbumBlockProps) {
         </div>
       ) : (
         <div>
-          <div className="relative overflow-hidden rounded-2xl bg-black">
-            <img src={current.src} alt={current.alt} className="aspect-[4/3] w-full object-cover" />
+          <div className="relative mx-auto w-full max-w-4xl overflow-hidden rounded-2xl bg-black">
+            <img src={current.src} alt={current.alt} className="mx-auto block h-auto max-h-[28rem] w-auto max-w-full" />
             {photos.length > 1 ? (
               <>
                 <button
@@ -262,13 +262,13 @@ function CarouselTrack({
 
 function GalleryGrid({ photos }: { photos: AlbumImage[] }) {
   return (
-    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+    <div className="mx-auto grid w-full max-w-3xl grid-cols-2 gap-2 sm:grid-cols-3">
       {photos.map((image, photoIndex) => (
         <img
           key={`${image.src}-${photoIndex}`}
           src={image.src}
           alt={image.alt}
-          className={`${GALLERY_SPAN[image.size] ?? GALLERY_SPAN.medium} aspect-square w-full rounded-xl object-cover`}
+          className={`${GALLERY_SPAN[image.size] ?? GALLERY_SPAN.medium} ${image.size === 'large' ? 'h-52 sm:h-64' : image.size === 'small' ? 'h-32 sm:h-40' : 'h-40 sm:h-52'} w-full rounded-xl object-cover`}
         />
       ))}
     </div>
