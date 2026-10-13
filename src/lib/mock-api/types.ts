@@ -11,6 +11,8 @@ export const MOCK_COLLECTIONS: MockCollection[] = [
   'patrimony',
   'presentations',
   'media',
+  'homepage',
+  'blogpage',
 ];
 
 export type MockRecord = Record<string, unknown> & { id: string };

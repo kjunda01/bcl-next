@@ -239,6 +239,37 @@
   ],
   "presentations": [
     {
+      "id": "pres-3",
+      "title": "Concerto de outubro na praça",
+      "venue": "Praça da Matriz, Luminárias",
+      "startsAt": "2026-10-25T22:00:00.000Z",
+      "description": "Repertório de marchas e hinos com participação da comunidade. Traga a família.",
+      "repertoireIds": [
+        "song-1",
+        "song-2"
+      ],
+      "coverUrl": "/imgs/img2.jpg",
+      "isPublic": true,
+      "status": "scheduled",
+      "createdAt": "2026-10-01T10:00:00.000Z",
+      "updatedAt": "2026-10-01T10:00:00.000Z"
+    },
+    {
+      "id": "pres-4",
+      "title": "Apresentação de fim de ano",
+      "venue": "Centro Cultural, Luminárias",
+      "startsAt": "2026-12-15T23:00:00.000Z",
+      "description": "Encerramento do ano com o repertório preparado pelos alunos e músicos.",
+      "repertoireIds": [
+        "song-1"
+      ],
+      "coverUrl": "/imgs/img3.jpg",
+      "isPublic": true,
+      "status": "scheduled",
+      "createdAt": "2026-10-05T10:00:00.000Z",
+      "updatedAt": "2026-10-05T10:00:00.000Z"
+    },
+    {
       "id": "pres-1",
       "title": "Concertos de setembro",
       "venue": "Praça da Matriz, Luminárias",
@@ -250,9 +281,9 @@
       ],
       "coverUrl": "/imgs/img1.jpg",
       "isPublic": true,
-      "status": "scheduled",
+      "status": "done",
       "createdAt": "2026-08-01T10:00:00.000Z",
-      "updatedAt": "2026-08-01T10:00:00.000Z"
+      "updatedAt": "2026-09-21T10:00:00.000Z"
     },
     {
       "id": "pres-2",
@@ -287,13 +318,396 @@
       "title": "Galeria: ensaio na praça",
       "slug": "galeria-ensaio",
       "excerpt": "Registros do último ensaio aberto ao público.",
-      "body": "Fotos do ensaio aberto.",
+      "body": "O ensaio aberto reuniu familiares e moradores em volta da praça.\n\nConfira mais fotos nas próximas publicações e acompanhe a agenda para o próximo concerto.",
       "coverUrl": "/imgs/img3.jpg",
       "kind": "photo",
       "status": "published",
       "publishedAt": "2026-09-10T10:00:00.000Z",
       "createdAt": "2026-09-10T10:00:00.000Z",
       "updatedAt": "2026-09-10T10:00:00.000Z"
+    },
+    {
+      "id": "media-3",
+      "title": "Vagas para novos alunos",
+      "slug": "vagas-alunos",
+      "excerpt": "Interessado em aprender música com a banda? Saiba como participar dos processos seletivos.",
+      "body": "A banda mantém formação contínua para instrumentos de sopro e percussão, com acompanhamento de músicos experientes.\n\nAs inscrições e cronogramas são comunicados aqui no blog e na sede. Fique atento aos avisos e traga sua curiosidade musical.",
+      "coverUrl": "/imgs/img4.jpg",
+      "kind": "article",
+      "status": "published",
+      "publishedAt": "2026-10-08T10:00:00.000Z",
+      "createdAt": "2026-10-08T10:00:00.000Z",
+      "updatedAt": "2026-10-08T10:00:00.000Z"
+    },
+    {
+      "id": "media-4",
+      "title": "3º Campeonato de Truco da Banda",
+      "slug": "torneio-de-truco",
+      "excerpt": "No dia 11 de outubro, a sede da Banda Carmelitana Luminarense encheu de duplas, cartas e troféu. Veja como foi o 3º Campeonato de Truco.",
+      "body": "Domingo, 11 de outubro de 2026, a sede da Banda Carmelitana Luminarense virou mesa de jogo. A partir das 13h começou o 3º Campeonato de Truco, com duplas, premiação em dinheiro e troféus para quem ficou em primeiro, segundo e terceiro lugar.\nEntre uma mão e outra, o salão da banda ficou cheio: cartas na mesa, anotação de pontos e o bar com cerveja, refrigerante e petiscos, como o cartaz da porta anunciava.\nDuplas, a partir das 13h\nSede da banda, em Luminárias\nTroféu e premiação para as três primeiras duplas\n\nO convite na porta\nO cartaz em preto e branco deixava a regra clara: 3º campeonato de truco da Banda Carmelitana Luminarense. Truco, aqui, também é encontro de quem acompanha a banda dentro e fora do palco.\n\nBoi contra Dourado\nA arte do campeonato colocou o Boi e o Dourado frente a frente, com a lira da banda ao fundo. No letreiro, a frase que guiou a tarde: truco é respeito, parceria e tradição.\n\nOutra dupla ganhou desenho próprio: Botijão de Gás e Manga, de chapéu, copo na mesa e a sede da banda atrás. O humor dos cartazes entrou no clima das partidas.\n\nO salão lotado\nAs mesas vermelhas se espalharam pelo salão. Enquanto uma dupla puxava a mão, outra anotava o placar. No fundo, os troféus da banda e os instrumentos lembravam a casa de quem estava jogando.\n\nIntervalo de petisco\nO cartaz prometia petisco, e a promessa saiu da churrasqueira. Teve espetinho, pão e o bar da sede para atravessar a tarde sem levantar da cadeira por muito tempo.\n\nEm vídeo\nOs registros abaixo acompanham a ordem da tarde, da preparação das mesas à premiação.\n\nO troféu de campeão fechou o 3º Campeonato de Truco. Na próxima, a sede abre de novo: cartas na mesa e a banda por perto.",
+      "coverUrl": "/assets/blog/torneio-truco/cartaz-boi.jpeg",
+      "videoUrl": "/assets/blog/torneio-truco/video-01.mp4",
+      "kind": "article",
+      "status": "published",
+      "publishedAt": "2026-10-11T18:00:00.000Z",
+      "createdAt": "2026-10-11T18:00:00.000Z",
+      "updatedAt": "2026-10-13T15:00:00.000Z",
+      "blocks": [
+        {
+          "id": "block-1",
+          "type": "text",
+          "text": "<p>Domingo, <strong>11 de outubro de 2026</strong>, a sede da Banda Carmelitana Luminarense virou mesa de jogo. A partir das 13h começou o <strong>3º Campeonato de Truco</strong>, com duplas, premiação em dinheiro e troféus para quem ficou em primeiro, segundo e terceiro lugar.</p><p>Entre uma mão e outra, o salão da banda ficou cheio: cartas na mesa, anotação de pontos e o bar com cerveja, refrigerante e petiscos, como o cartaz da porta anunciava.</p><ul><li>Duplas, a partir das 13h</li><li>Sede da banda, em Luminárias</li><li>Troféu e premiação para as três primeiras duplas</li></ul>"
+        },
+        {
+          "id": "block-2",
+          "type": "section",
+          "layout": "text-image",
+          "size": "medium",
+          "src": "/assets/blog/torneio-truco/cartaz-sede.jpeg",
+          "alt": "Cartaz do 3º Campeonato de Truco colado na sede da banda",
+          "caption": "O cartaz na sede: domingo, 11/10, a partir das 13h.",
+          "text": "<h2>O convite na porta</h2><p>O cartaz em preto e branco deixava a regra clara: <em>3º campeonato de truco da Banda Carmelitana Luminarense</em>. Truco, aqui, também é encontro de quem acompanha a banda dentro e fora do palco.</p>"
+        },
+        {
+          "id": "block-3",
+          "type": "section",
+          "layout": "image-text",
+          "size": "large",
+          "src": "/assets/blog/torneio-truco/cartaz-boi.jpeg",
+          "alt": "Cartaz ilustrado Boi contra Dourado no campeonato de truco da banda",
+          "caption": "Boi contra Dourado: truco é tropa.",
+          "text": "<h2>Boi contra Dourado</h2><p>A arte do campeonato colocou o Boi e o Dourado frente a frente, com a lira da banda ao fundo. No letreiro, a frase que guiou a tarde: <strong>truco é respeito, parceria e tradição</strong>.</p>"
+        },
+        {
+          "id": "block-4",
+          "type": "section",
+          "layout": "stack-image",
+          "size": "large",
+          "src": "/assets/blog/torneio-truco/cartaz-dupla.jpeg",
+          "alt": "Cartaz da dupla Botijão de Gás contra Manga",
+          "caption": "Botijão de Gás contra Manga, em Luminárias.",
+          "text": "<p>Outra dupla ganhou desenho próprio: <strong>Botijão de Gás</strong> e <strong>Manga</strong>, de chapéu, copo na mesa e a sede da banda atrás. O humor dos cartazes entrou no clima das partidas.</p>"
+        },
+        {
+          "id": "block-5",
+          "type": "text",
+          "text": "<h2>O salão lotado</h2><p>As mesas vermelhas se espalharam pelo salão. Enquanto uma dupla puxava a mão, outra anotava o placar. No fundo, os troféus da banda e os instrumentos lembravam a casa de quem estava jogando.</p>"
+        },
+        {
+          "id": "block-6",
+          "type": "album",
+          "layout": "carousel",
+          "caption": "As mesas do 3º Campeonato de Truco, na sede da banda.",
+          "images": [
+            {
+              "src": "/assets/blog/torneio-truco/sala-mesas.jpeg",
+              "alt": "Mesas vermelhas ocupadas durante o campeonato de truco",
+              "size": "large"
+            },
+            {
+              "src": "/assets/blog/torneio-truco/anotacao.jpeg",
+              "alt": "Jogadores anotando os pontos de uma partida",
+              "size": "large"
+            },
+            {
+              "src": "/assets/blog/torneio-truco/sala-instrumentos.jpeg",
+              "alt": "Salão da banda com instrumentos e mesas de truco",
+              "size": "large"
+            }
+          ]
+        },
+        {
+          "id": "block-7",
+          "type": "section",
+          "layout": "stack-text",
+          "size": "medium",
+          "src": "/assets/blog/torneio-truco/espetinhos.jpeg",
+          "alt": "Espetinhos servidos no intervalo do campeonato",
+          "caption": "Espetinho no intervalo.",
+          "text": "<h2>Intervalo de petisco</h2><p>O cartaz prometia petisco, e a promessa saiu da churrasqueira. Teve espetinho, pão e o bar da sede para atravessar a tarde sem levantar da cadeira por muito tempo.</p>"
+        },
+        {
+          "id": "block-8",
+          "type": "image",
+          "size": "small",
+          "src": "/assets/blog/torneio-truco/lanche.jpeg",
+          "alt": "Pão e bebida em uma das mesas vermelhas",
+          "caption": "A mesa também serviu de lanche."
+        },
+        {
+          "id": "block-9",
+          "type": "image",
+          "size": "medium",
+          "src": "/assets/blog/torneio-truco/mesa.jpeg",
+          "alt": "Lata sobre a mesa antes das partidas",
+          "caption": "O bar anunciado no cartaz, no meio das mesas."
+        },
+        {
+          "id": "block-10",
+          "type": "image",
+          "size": "large",
+          "src": "/assets/blog/torneio-truco/placar.jpeg",
+          "alt": "Placar digital de truco com nós e eles",
+          "caption": "Nós e eles: o placar da mão, do truque ao zerar os pontos."
+        },
+        {
+          "id": "block-11",
+          "type": "album",
+          "layout": "gallery",
+          "caption": "Do cartaz ao troféu de campeão.",
+          "images": [
+            {
+              "src": "/assets/blog/torneio-truco/trofeu.jpeg",
+              "alt": "Campeão ergue o troféu do torneio de truco",
+              "size": "large"
+            },
+            {
+              "src": "/assets/blog/torneio-truco/campeao.jpeg",
+              "alt": "Troféu de campeão do torneio de truco",
+              "size": "medium"
+            },
+            {
+              "src": "/assets/blog/torneio-truco/cartaz-boi.jpeg",
+              "alt": "Ilustração Boi contra Dourado",
+              "size": "small"
+            }
+          ]
+        },
+        {
+          "id": "block-12",
+          "type": "album",
+          "layout": "thumbnails",
+          "caption": "Detalhes da tarde: arte, comida e o salão.",
+          "images": [
+            {
+              "src": "/assets/blog/torneio-truco/cartaz-dupla.jpeg",
+              "alt": "Cartaz Botijão de Gás contra Manga",
+              "size": "medium"
+            },
+            {
+              "src": "/assets/blog/torneio-truco/espetinhos.jpeg",
+              "alt": "Espetinhos do intervalo",
+              "size": "medium"
+            },
+            {
+              "src": "/assets/blog/torneio-truco/sala-mesas.jpeg",
+              "alt": "Visão geral das mesas",
+              "size": "medium"
+            },
+            {
+              "src": "/assets/blog/torneio-truco/cartaz-sede.jpeg",
+              "alt": "Cartaz impresso do campeonato",
+              "size": "medium"
+            }
+          ]
+        },
+        {
+          "id": "block-13",
+          "type": "text",
+          "text": "<h2>Em vídeo</h2><p>Os registros abaixo acompanham a ordem da tarde, da preparação das mesas à premiação.</p>"
+        },
+        {
+          "id": "block-14",
+          "type": "video",
+          "youtubeId": "",
+          "src": "/assets/blog/torneio-truco/video-01.mp4",
+          "caption": "Preparação, no começo da tarde."
+        },
+        {
+          "id": "block-15",
+          "type": "video",
+          "youtubeId": "",
+          "src": "/assets/blog/torneio-truco/video-02.mp4",
+          "caption": "As mesas começando a encher."
+        },
+        {
+          "id": "block-16",
+          "type": "video",
+          "youtubeId": "",
+          "src": "/assets/blog/torneio-truco/video-03.mp4",
+          "caption": "Uma das mãos do campeonato."
+        },
+        {
+          "id": "block-17",
+          "type": "video",
+          "youtubeId": "",
+          "src": "/assets/blog/torneio-truco/video-04.mp4",
+          "caption": "A partida esquenta."
+        },
+        {
+          "id": "block-18",
+          "type": "video",
+          "youtubeId": "",
+          "src": "/assets/blog/torneio-truco/video-05.mp4",
+          "caption": "O salão no meio do torneio."
+        },
+        {
+          "id": "block-19",
+          "type": "video",
+          "youtubeId": "",
+          "src": "/assets/blog/torneio-truco/video-06.mp4",
+          "caption": "A premiação, no fim da tarde."
+        },
+        {
+          "id": "block-20",
+          "type": "text",
+          "text": "<p>O troféu de campeão fechou o <strong>3º Campeonato de Truco</strong>. Na próxima, a sede abre de novo: cartas na mesa e a banda por perto.</p>"
+        }
+      ]
+    }
+  ],
+  "homepage": [
+    {
+      "id": "home",
+      "updatedAt": "2026-10-13T12:00:00.000Z",
+      "sections": [
+        {
+          "type": "hero",
+          "enabled": true,
+          "eyebrow": "Luminárias · Minas Gerais",
+          "title": "Banda Carmelitana Luminarense",
+          "subtitle": "Concertos, história e notícias da banda em um só lugar. Explore a agenda pública, leia matérias e conheça mais de um século de música na região.",
+          "imageUrl": "/imgs/img1.jpg",
+          "links": [
+            {
+              "label": "Próximos eventos",
+              "href": "/agenda"
+            },
+            {
+              "label": "Blog e galeria",
+              "href": "/blog"
+            },
+            {
+              "label": "Sobre a banda",
+              "href": "/sobre"
+            }
+          ]
+        },
+        {
+          "type": "highlights",
+          "enabled": true,
+          "items": [
+            {
+              "value": "1894",
+              "label": "Origens da tradição musical local"
+            },
+            {
+              "value": "1910",
+              "label": "Fundação associativa"
+            },
+            {
+              "value": "Hoje",
+              "label": "Formação, ensaios e concertos"
+            }
+          ]
+        },
+        {
+          "type": "events",
+          "enabled": true,
+          "title": "Próximas apresentações",
+          "description": "Eventos abertos ao público. Confira horário e local antes de ir.",
+          "linkLabel": "Agenda completa",
+          "limit": 3
+        },
+        {
+          "type": "blog",
+          "enabled": true,
+          "title": "Do blog",
+          "description": "Matérias, fotos e avisos para quem acompanha a banda.",
+          "linkLabel": "Ver todas as publicações",
+          "limit": 3
+        },
+        {
+          "type": "story",
+          "enabled": true,
+          "title": "Uma instituição viva na cidade",
+          "body": "A banda forma músicos, mantém o repertório e participa da vida cultural de Luminárias. No portal público você acompanha eventos e notícias; alunos, músicos e equipe acessam a área interna para estudo e gestão.",
+          "linkLabel": "Conheça nossa história",
+          "images": [
+            {
+              "src": "/imgs/img1.jpg",
+              "alt": "Banda Carmelitana Luminarense em apresentação"
+            },
+            {
+              "src": "/imgs/img2.jpg",
+              "alt": "Músicos da banda em formação"
+            },
+            {
+              "src": "/imgs/img3.jpg",
+              "alt": "Ensaio aberto na praça"
+            },
+            {
+              "src": "/imgs/img4.jpg",
+              "alt": "Tradição musical em Luminárias"
+            }
+          ]
+        },
+        {
+          "type": "videos",
+          "enabled": true,
+          "title": "Vídeos",
+          "description": "Registros de apresentações e momentos da banda.",
+          "videoIds": [
+            "TbUGOc36r9s",
+            "zgNL45Nl1qA",
+            "eTjkMqHKOvo",
+            "sldhCGZ-KgQ",
+            "jaFIxhNqYnw"
+          ],
+          "limit": 3
+        },
+        {
+          "type": "cta",
+          "enabled": true,
+          "titleLoggedOut": "Faz parte da banda?",
+          "bodyLoggedOut": "Alunos, músicos e equipe entram com login para estudo, gestão e informações internas.",
+          "buttonLoggedOut": "Entrar na área interna",
+          "titleLoggedIn": "Continue de onde parou",
+          "bodyLoggedIn": "Acesse o painel, o repertório e o modo de estudo conforme o seu perfil.",
+          "buttonLoggedIn": "Ir para o painel"
+        }
+      ]
+    }
+  ],
+  "blogpage": [
+    {
+      "id": "blog",
+      "updatedAt": "2026-10-13T13:00:00.000Z",
+      "postOrder": [
+        "media-4",
+        "media-3",
+        "media-2",
+        "media-1"
+      ],
+      "sections": [
+        {
+          "type": "header",
+          "enabled": true,
+          "eyebrow": "Portal",
+          "title": "Blog",
+          "description": "Histórias, fotos, vídeos e avisos da Banda Carmelitana Luminarense. Acompanhe o que acontece dentro e fora do palco."
+        },
+        {
+          "type": "filters",
+          "enabled": true
+        },
+        {
+          "type": "featured",
+          "enabled": true
+        },
+        {
+          "type": "list",
+          "enabled": true
+        },
+        {
+          "type": "cta",
+          "enabled": true,
+          "title": "Quer saber onde a banda toca?",
+          "description": "A agenda pública reúne datas, locais e descrições dos próximos eventos abertos à comunidade.",
+          "linkLabel": "Ver agenda",
+          "href": "/agenda"
+        }
+      ]
     }
   ]
 }

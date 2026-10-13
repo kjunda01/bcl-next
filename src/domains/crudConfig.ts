@@ -1,4 +1,4 @@
-import type { Resource } from '@/core/auth/permissions';
+import type { CrudResource } from '@/core/auth/permissions';
 import { isPersonUnderage } from '@/domains/people/types';
 
 export type CrudFieldType =
@@ -39,7 +39,7 @@ export interface CrudColumn {
 }
 
 export interface DomainCrudConfig {
-  resource: Exclude<Resource, 'portal'>;
+  resource: CrudResource;
   singular: string;
   fields: CrudField[];
   columns: CrudColumn[];
@@ -631,7 +631,7 @@ const media: DomainCrudConfig = {
     ),
 };
 
-const CONFIGS: Record<Exclude<Resource, 'portal'>, DomainCrudConfig> = {
+const CONFIGS: Record<CrudResource, DomainCrudConfig> = {
   users,
   people,
   songs,
@@ -641,7 +641,7 @@ const CONFIGS: Record<Exclude<Resource, 'portal'>, DomainCrudConfig> = {
   media,
 };
 
-export function getCrudConfig(resource: Exclude<Resource, 'portal'>): DomainCrudConfig {
+export function getCrudConfig(resource: CrudResource): DomainCrudConfig {
   return CONFIGS[resource];
 }
 

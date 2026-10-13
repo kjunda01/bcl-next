@@ -35,6 +35,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    if (!moreOpen || desktop) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMoreOpen(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [moreOpen, desktop]);
+
+  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (userMenuOpen && !(event.target as Element).closest('.user-menu')) {
         setUserMenuOpen(false);
@@ -131,8 +145,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <header className="sticky top-0 z-50 flex items-center gap-2 px-4 h-14 bg-[var(--header-bg)] text-[var(--header-fg)]">
             <button
               type="button"
-              className="inline-flex items-center justify-center w-10 h-10 rounded-full text-white"
-              aria-label="Abrir menu"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full text-white"
+              aria-label={moreOpen ? 'Fechar menu' : 'Abrir menu'}
+              aria-expanded={moreOpen}
               onClick={() => setMoreOpen((v) => !v)}
             >
               <span className="material-icons">menu</span>
@@ -142,7 +157,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <div className="relative user-menu">
               <button
                 type="button"
-                className="inline-flex items-center justify-center w-10 h-10 rounded-full text-white"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full text-white"
+                aria-label="Conta"
+                aria-expanded={userMenuOpen}
                 onClick={() => setUserMenuOpen((v) => !v)}
               >
                 <span className="material-icons">account_circle</span>
@@ -177,9 +194,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         {!desktop && moreOpen && (
           <aside className="fixed top-0 left-0 bottom-0 w-[80%] max-w-[280px] z-[130] flex flex-col" style={{ backgroundColor: 'var(--sidebar-bg)' }}>
-            <div className="flex items-center justify-between px-4 py-4 text-[var(--header-fg)]">
+            <div className="flex items-center justify-between px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] text-[var(--header-fg)]">
               <span className="font-semibold">Menu</span>
-              <button type="button" onClick={() => setMoreOpen(false)}>
+              <button type="button" className="inline-flex h-11 w-11 items-center justify-center" aria-label="Fechar menu" onClick={() => setMoreOpen(false)}>
                 <span className="material-icons">close</span>
               </button>
             </div>
@@ -188,7 +205,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <Link
                   key={`${item.href}-${item.label}`}
                   href={item.href}
-                  className="flex items-center gap-3 px-4 py-3 text-[var(--sidebar-fg)] no-underline hover:no-underline text-sm"
+                  className="flex min-h-12 items-center gap-3 px-4 text-[var(--sidebar-fg)] no-underline hover:no-underline text-sm"
                   onClick={() => setMoreOpen(false)}
                 >
                   <span className="material-icons">{item.icon}</span>

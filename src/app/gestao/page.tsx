@@ -25,7 +25,9 @@ export default function GestaoPage() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {nav.map((item) => {
           const domain = DOMAINS.find((entry) => entry.path === item.href);
-          const writable = domain ? can(roles, domain.id, 'create') : false;
+          const writable = domain
+            ? can(roles, domain.id, 'create') || can(roles, domain.id, 'update')
+            : false;
           const isStudy = item.href === '/study';
           return (
             <Link

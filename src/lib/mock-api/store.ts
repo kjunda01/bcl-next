@@ -13,6 +13,13 @@ function cloneSeed(): MockDb {
 export function getMockDb(): MockDb {
   if (!globalStore.__bclMockDb) {
     globalStore.__bclMockDb = cloneSeed();
+  } else {
+    if (!Array.isArray(globalStore.__bclMockDb.homepage)) {
+      globalStore.__bclMockDb.homepage = structuredClone(seed.homepage);
+    }
+    if (!Array.isArray(globalStore.__bclMockDb.blogpage)) {
+      globalStore.__bclMockDb.blogpage = structuredClone(seed.blogpage);
+    }
   }
   return globalStore.__bclMockDb;
 }

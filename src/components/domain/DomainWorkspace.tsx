@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from 'react';
 import { apiFetch } from '@/lib/api';
-import { can, type Resource } from '@/core/auth/permissions';
+import { can } from '@/core/auth/permissions';
 import { canAssignRole } from '@/core/auth/permissions';
 import { hasRole, roleLabels, type AccessRoles } from '@/core/auth/roles';
 import { useAuth } from '@/contexts/AuthContext';
@@ -13,12 +13,13 @@ import {
   type CrudColumn,
   type CrudField,
 } from '@/domains/crudConfig';
+import type { CrudResource } from '@/core/auth/permissions';
 import { filterPeopleForRole } from '@/domains/people/visibility';
 import type { Person } from '@/domains/people/types';
 import { DomainGuard } from './DomainGuard';
 
 interface DomainWorkspaceProps {
-  resource: Exclude<Resource, 'portal'>;
+  resource: CrudResource;
   /** @deprecated Columns and fields now come from the domain CRUD configuration. */
   entityFields?: string[];
 }
@@ -580,7 +581,7 @@ function validateValues(fields: CrudField[], values: Record<string, unknown>): R
   return errors;
 }
 
-function uniqueFieldsForResource(resource: Exclude<Resource, 'portal'>): string[] {
+function uniqueFieldsForResource(resource: CrudResource): string[] {
   if (resource === 'users') return ['email'];
   if (resource === 'people') return ['email', 'document'];
   if (resource === 'media') return ['slug'];

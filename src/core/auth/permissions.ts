@@ -10,6 +10,8 @@ export const RESOURCES = [
   'instruments',
   'presentations',
   'media',
+  'homepage',
+  'blogpage',
 ] as const;
 
 export type Resource = (typeof RESOURCES)[number];
@@ -18,6 +20,9 @@ export const ACTIONS = ['read', 'create', 'update', 'delete', 'manage_roles', 'a
 export type Action = (typeof ACTIONS)[number];
 
 export type Permission = `${Resource}:${Action}`;
+
+/** Domínios com formulário genérico. A home tem editor próprio. */
+export type CrudResource = Exclude<Resource, 'portal' | 'homepage' | 'blogpage'>;
 
 export type PeopleReadScope = 'none' | 'students' | 'members';
 
@@ -61,6 +66,8 @@ const ROLE_ACTIONS: Record<Role, Partial<Record<Resource, Action[]>>> = {
     people: FULL_CRUD,
     presentations: FULL_CRUD,
     users: [...FULL_CRUD, 'manage_roles', 'assign_admin'],
+    homepage: ['read', 'update'],
+    blogpage: ['read', 'update'],
   },
 };
 
