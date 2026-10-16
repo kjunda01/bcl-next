@@ -8,6 +8,7 @@ import { PostBlocks } from '@/components/blog/PostBlocks';
 import { readBlocks } from '@/domains/media/blocks';
 import { apiFetch } from '@/lib/api';
 import { formatPublishedDate, mediaKindLabel } from '@/lib/publicPortal';
+import { UNDER_CONSTRUCTION_MESSAGE } from '@/lib/userMessages';
 import type { MediaPost } from '@/domains/media/types';
 
 const postShellClass = 'mx-auto w-[85%] py-16';
@@ -15,6 +16,7 @@ const postShellClass = 'mx-auto w-[85%] py-16';
 export default function BlogPostPage() {
   const params = useParams<{ slug: string }>();
   const [post, setPost] = useState<MediaPost | null | undefined>(undefined);
+  const [loadError, setLoadError] = useState(false);
 
   const slug = params?.slug;
 
@@ -22,13 +24,24 @@ export default function BlogPostPage() {
     if (!slug) return;
     apiFetch<MediaPost[]>('/media')
       .then((items) => setPost(items.find((item) => item.slug === slug && item.status === 'published') ?? null))
-      .catch(() => setPost(null));
+      .catch(() => setLoadError(true));
   }, [slug]);
 
   if (post === undefined) {
     return (
       <div className={postShellClass}>
         <p className="text-[var(--muted)]">Carregando…</p>
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className={postShellClass}>
+        <p className="text-[var(--muted)]">{UNDER_CONSTRUCTION_MESSAGE}</p>
+        <Link href="/blog" className="mt-4 inline-flex min-h-11 items-center text-[var(--color-brand-strong)]">
+          Voltar ao blog
+        </Link>
       </div>
     );
   }

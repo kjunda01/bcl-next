@@ -10,6 +10,7 @@ import type { HomepageDocument, HomeSection } from '@/domains/homepage/types';
 import type { MediaPost } from '@/domains/media/types';
 import type { Presentation } from '@/domains/presentations/types';
 import { upcomingPublicPresentations, publishedMediaPosts } from '@/lib/publicPortal';
+import { UNDER_CONSTRUCTION_MESSAGE } from '@/lib/userMessages';
 
 interface HomePageContentProps {
   document: HomepageDocument;
@@ -156,11 +157,7 @@ function HomeSectionBlock({
         />
         {portalError ? (
           <p className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6 text-[var(--muted)]">
-            Não foi possível carregar os eventos agora. Acesse a{' '}
-            <Link href="/agenda" className="text-[var(--color-brand-strong)]">
-              agenda
-            </Link>
-            .
+            {UNDER_CONSTRUCTION_MESSAGE}
           </p>
         ) : upcoming.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-[var(--border)] bg-[var(--card)] p-8 text-center">

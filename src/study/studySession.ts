@@ -1,5 +1,6 @@
 import { OpenSheetMusicDisplay } from 'opensheetmusicdisplay';
 import { Player, VerovioConverter } from '@music-i18n/musicxml-player';
+import { UNDER_CONSTRUCTION_MESSAGE } from '@/lib/userMessages';
 import { OsmdPlaybackRenderer } from './osmdPlaybackRenderer';
 import { StudyPlayerController } from './studyPlayerController';
 import {
@@ -586,7 +587,7 @@ export class StudySession {
       const mount = this.options.getOsmdContainer();
       if (!ready || !mount) {
         this.scoreLoading = false;
-        this.scoreError = 'Não foi possível montar a área da partitura.';
+        this.scoreError = UNDER_CONSTRUCTION_MESSAGE;
         this.emit();
         return;
       }
@@ -622,7 +623,7 @@ export class StudySession {
       console.error('Falha ao renderizar a partitura com o OSMD:', err);
       if (token === this.loadToken) {
         this.scoreLoading = false;
-        this.scoreError = 'Falha ao renderizar a partitura.';
+        this.scoreError = UNDER_CONSTRUCTION_MESSAGE;
       }
     }
     this.emit();
@@ -762,9 +763,7 @@ export class StudySession {
       const isVeryLarge = xmlLen > 2_000_000;
       this.midiOnlyMode = isVeryLarge;
       this.playerReady = true;
-      this.playerError = isVeryLarge
-        ? null
-        : 'Não foi possível preparar o áudio. Tente recarregar a partitura.';
+      this.playerError = isVeryLarge ? null : UNDER_CONSTRUCTION_MESSAGE;
     } finally {
       if (token === this.loadToken) {
         this.playerLoading = false;
@@ -1121,12 +1120,12 @@ export class StudySession {
       await this.loadMidiForCurrentScore(token);
       if (token !== this.loadToken) return;
       if (!this.midiLoaded) {
-        this.playerError = this.midiOnlyMode ? 'MIDI não disponível para esta partitura.' : 'Player indisponível.';
+        this.playerError = UNDER_CONSTRUCTION_MESSAGE;
         if (!this.midiOnlyMode) this.playerReady = false;
       }
     } catch {
       if (token === this.loadToken) {
-        this.playerError = 'Player indisponível.';
+        this.playerError = UNDER_CONSTRUCTION_MESSAGE;
         if (!this.midiOnlyMode) this.playerReady = false;
       }
     } finally {

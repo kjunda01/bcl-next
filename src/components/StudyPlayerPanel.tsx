@@ -1,3 +1,5 @@
+import { UNDER_CONSTRUCTION_MESSAGE } from '@/lib/userMessages';
+
 type PlayerSlice = {
   loading: boolean;
   playerReady: boolean;
@@ -64,7 +66,7 @@ export function StudyPlayerPanel({
         ) : null}
         <div className="px-4 py-4 text-center">
           <p className="text-sm text-[var(--muted)]">
-            {state.playerError ? 'Player indisponível.' : 'Preparando o player...'}
+            {state.playerError ? UNDER_CONSTRUCTION_MESSAGE : 'Preparando o player...'}
           </p>
         </div>
       </aside>

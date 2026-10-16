@@ -19,6 +19,7 @@ import {
 import type { AlbumLayout, MediaKind, MediaPost, MediaSize, MediaStatus, PostBlock, SectionLayout } from '@/domains/media/types';
 import { apiFetch } from '@/lib/api';
 import { uploadMediaFile } from '@/lib/uploadMedia';
+import { UNDER_CONSTRUCTION_MESSAGE, userFacingError } from '@/lib/userMessages';
 
 interface PostEditorProps {
   postId?: string;
@@ -53,7 +54,7 @@ export function PostEditor({ postId }: PostEditorProps) {
         setPost({ ...found, blocks: readBlocks(found) });
         setSlugTouched(true);
       })
-      .catch(() => setError('Não foi possível carregar o post.'))
+      .catch(() => setError(UNDER_CONSTRUCTION_MESSAGE))
       .finally(() => setLoading(false));
   }, [postId]);
 
@@ -127,7 +128,7 @@ export function PostEditor({ postId }: PostEditorProps) {
       });
       setPost({ ...draft, ...payload, id: postId });
     } catch {
-      setError('Não foi possível salvar o post.');
+      setError(UNDER_CONSTRUCTION_MESSAGE);
     } finally {
       setSaving(false);
     }
@@ -505,7 +506,7 @@ function AlbumFields({
             Promise.all(files.map((file) => uploadMediaFile(file)))
               .then((sources) => addImages(sources.map((src) => ({ src, alt: '', size: 'medium' as const }))))
               .catch((reason: unknown) => {
-                onError(reason instanceof Error ? reason.message : 'Não foi possível enviar as fotos.');
+                onError(userFacingError(reason));
               })
               .finally(() => setUploading(false));
           }}

@@ -2,6 +2,7 @@
 
 import { useId, useState } from 'react';
 import { uploadMediaFile } from '@/lib/uploadMedia';
+import { userFacingError } from '@/lib/userMessages';
 
 interface MediaSourceFieldProps {
   label: string;
@@ -44,7 +45,7 @@ export function MediaSourceField({ label, value, accept, placeholder, onChange, 
               uploadMediaFile(file)
                 .then(onChange)
                 .catch((reason: unknown) => {
-                  onError(reason instanceof Error ? reason.message : 'Não foi possível enviar o arquivo.');
+                  onError(userFacingError(reason));
                 })
                 .finally(() => setUploading(false));
             }}

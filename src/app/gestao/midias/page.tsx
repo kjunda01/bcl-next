@@ -7,6 +7,7 @@ import { parseMediaPost } from '@/domains/media/blocks';
 import { mediaKindLabel } from '@/lib/publicPortal';
 import type { MediaPost } from '@/domains/media/types';
 import { apiFetch } from '@/lib/api';
+import { UNDER_CONSTRUCTION_MESSAGE } from '@/lib/userMessages';
 
 export default function MidiasPage() {
   return (
@@ -26,7 +27,7 @@ function PostList() {
         const post = parseMediaPost(item);
         return post ? [post] : [];
       })))
-      .catch(() => setError('Não foi possível carregar os posts.'));
+      .catch(() => setError(UNDER_CONSTRUCTION_MESSAGE));
   }, []);
 
   return (

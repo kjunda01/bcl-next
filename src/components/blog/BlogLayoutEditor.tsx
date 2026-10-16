@@ -13,6 +13,7 @@ import { parseMediaPost } from '@/domains/media/blocks';
 import type { MediaPost } from '@/domains/media/types';
 import { orderMediaPosts } from '@/lib/publicPortal';
 import { apiFetch } from '@/lib/api';
+import { UNDER_CONSTRUCTION_MESSAGE } from '@/lib/userMessages';
 
 export function BlogLayoutEditor() {
   const [layout, setLayout] = useState<BlogPageDocument | null>(null);
@@ -40,7 +41,7 @@ export function BlogLayoutEditor() {
       })
       .catch(() => {
         setLayout(defaultBlogPage());
-        setError('Não foi possível carregar a organização salva.');
+        setError(UNDER_CONSTRUCTION_MESSAGE);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -84,7 +85,7 @@ export function BlogLayoutEditor() {
       setLayout(parseBlogPage(savedDoc));
       setSaved(true);
     } catch {
-      setError('Não foi possível publicar a organização do blog.');
+      setError(UNDER_CONSTRUCTION_MESSAGE);
     } finally {
       setSaving(false);
     }

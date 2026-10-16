@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { PortalPageHeader } from '@/components/public/PortalPageHeader';
 import { PresentationEventCard } from '@/components/public/PresentationEventCard';
 import { apiFetch } from '@/lib/api';
+import { UNDER_CONSTRUCTION_MESSAGE } from '@/lib/userMessages';
 import { sortPresentationsByDate, upcomingPublicPresentations } from '@/lib/publicPortal';
 import type { Presentation } from '@/domains/presentations/types';
 
@@ -16,7 +17,7 @@ export default function AgendaPage() {
   useEffect(() => {
     apiFetch<Presentation[]>('/presentations')
       .then((list) => setItems(list.filter((item) => item.isPublic)))
-      .catch(() => setError('Não foi possível carregar a agenda. Verifique se a API está disponível.'))
+      .catch(() => setError(UNDER_CONSTRUCTION_MESSAGE))
       .finally(() => setLoading(false));
   }, []);
 
