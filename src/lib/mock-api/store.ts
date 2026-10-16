@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import bundledSeed from '@/domains/seed/mock-api.json';
 import { MOCK_COLLECTIONS, type MockCollection, type MockDb, type MockRecord } from './types';
 
 const seedPath = path.join(process.cwd(), 'src/domains/seed/mock-api.json');
@@ -10,7 +11,12 @@ const globalStore = globalThis as typeof globalThis & {
 };
 
 function readSeedFile(): MockDb {
-  return JSON.parse(readFileSync(seedPath, 'utf8')) as MockDb;
+  try {
+    return JSON.parse(readFileSync(seedPath, 'utf8')) as MockDb;
+  } catch {
+    // No deploy o JSON entra no bundle; o arquivo em src/ pode não existir no runtime.
+    return structuredClone(bundledSeed) as MockDb;
+  }
 }
 
 /** Banco em memória. Na primeira leitura, carrega o mock-api.json. */
@@ -31,7 +37,13 @@ export function persistMockDb(): Promise<void> {
     () => undefined,
     () => undefined,
   );
-  return task;
+  return task.catch((error: NodeJS.ErrnoException) => {
+    // Vercel e outros runtimes de produção são só leitura; o mock em memória segue atendendo.
+    if (error.code === 'EROFS' || error.code === 'EACCES' || error.code === 'ENOENT') {
+      return;
+    }
+    throw error;
+  });
 }
 
 export function getCollection(name: MockCollection): MockRecord[] {

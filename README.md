@@ -45,42 +45,41 @@ npm install
 
 ## Como executar em desenvolvimento
 
-São dois processos: API mock e frontend.
-
-### 1. API mock
-
-```bash
-npm run api:server
-```
-
-Disponível em `http://localhost:3001`.
-
-### 2. Frontend
-
 ```bash
 npm run dev
 ```
 
-Disponível em `http://localhost:3000`.
+O frontend fica em `http://localhost:3000`. Portal em `/`, login em `/login`, gestão em `/gestao`.
 
-### 3. Acesso
+A URL da API vem de `NEXT_PUBLIC_API_URL`. Sem essa variável, o browser usa o mock do próprio Next em `/bcl-api`. Reinicie o `npm run dev` depois de mudar qualquer `.env`.
 
-- portal: `http://localhost:3000`
-- login: `http://localhost:3000/login`
-- gestão (após login): `http://localhost:3000/gestao`
-- API: `http://localhost:3001/people`
+No deploy de produção o site **usa o mock** (`/bcl-api`), porque o backend ainda não está publicado. Quando a API real estiver no ar, defina no ambiente de produção `NEXT_PUBLIC_USE_REMOTE_API=true` e `NEXT_PUBLIC_API_URL`.
 
 ## Variáveis de ambiente
 
-O cliente HTTP lê `NEXT_PUBLIC_API_URL`.
+O Next carrega `.env` e, por cima dele, `.env.local`. Os três arquivos estão no `.gitignore`.
 
-Exemplo de `.env.local`:
+| Arquivo | O que faz |
+| --- | --- |
+| `.env` | Padrão: API Spring em `http://localhost:8080` |
+| `.env.local` | Valor desta máquina. É o que vale quando existe |
+| `.env.mock` | Mock em `http://localhost:3000/bcl-api`. O Next não lê este arquivo sozinho |
+
+Para usar o backend, deixe no `.env.local`:
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:3001
+NEXT_PUBLIC_API_URL=http://localhost:8080
 ```
 
-Se a variável não existir, o fallback é `http://localhost:3001`.
+A API precisa estar no ar (`./mvnw spring-boot:run` em `backend`) e o site aberto em `http://localhost:3000`, que é a origem liberada no CORS.
+
+Para voltar ao mock, copie o conteúdo de `.env.mock` para `.env.local` e reinicie o dev:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3000/bcl-api
+```
+
+`npm run api:server` ainda sobe o `json-server` antigo em `http://localhost:3001`. O app não usa essa porta, a menos que `NEXT_PUBLIC_API_URL` aponte para ela.
 
 ## Scripts
 
@@ -108,17 +107,17 @@ A regra `can(roles, resource, action)` vive em `src/core/auth/permissions.ts`. U
 
 ### Contas de demonstração
 
-Login simulado. Na tela também há acesso rápido por perfil.
+Entre com o **nome de usuário** (ou o e-mail da pessoa) e a senha. Na tela também há acesso rápido por perfil.
 
-| Perfil | E-mail | Senha |
-| --- | --- | --- |
-| Admin | `admin@bcl.local` | `admin` |
-| Maestro | `maestro@bcl.local` | `maestro` |
-| Músico | `musico@bcl.local` | `musico` |
-| Aluno | `aluno@bcl.local` | `aluno` |
-| Aluno + Músico | `ambos@bcl.local` | `ambos` |
+| Perfil | Usuário | E-mail da pessoa | Senha |
+| --- | --- | --- | --- |
+| Admin | `admin` | `admin@bcl.local` | `#bcl.2026@` |
+| Maestro | `maestro` | `maestro@bcl.local` | `#bcl.2026@` |
+| Músico | `musico` | `helena.trompete@email.com` | `musico` |
+| Aluno | `aluno` | `pedro.clarineta@email.com` | `aluno` |
+| Aluno + Músico | `ambos` | `luisa.sax@email.com` | `ambos` |
 
-A pessoa pode ser aluno, músico ou os dois (`isStudent` / `isMusician`). A conta de login possui `roles[]`; o seed da Luísa Sax contém os perfis aluno e músico e, portanto, recebe a união das permissões.
+Modelo: **toda pessoa** (`/people`) tem nome, sobrenome, nascimento, documento (CPF ou RG), foto, telefone, endereço, data de cadastro e, se for menor de idade, outra pessoa cadastrada como responsável. Aluno (matrícula, turma, nível 1–5) e músico (naipe, experiência, voz padrão, instrumento próprio, instrumentos do patrimônio) são perfis opcionais da pessoa. O **usuário** (`/users`) é a conta de acesso de uma pessoa: só guarda `username`, status e `roles[]`; nome, e-mail e foto vêm da pessoa. Quem tem perfil de aluno recebe o papel `aluno`, quem tem perfil de músico recebe `musico` — a API mantém isso. A Luísa Sax é aluna e música e, portanto, recebe a união das permissões.
 
 ## Domínios e entidades
 
@@ -213,7 +212,7 @@ Tema claro/escuro: `src/contexts/ThemeContext.tsx` e a página `/settings`.
 
 ## API mock
 
-`db.json` alimenta o `json-server`. Recursos atuais:
+Com `NEXT_PUBLIC_API_URL` apontando para `/bcl-api`, as rotas do Next leem e gravam `src/domains/seed/mock-api.json`. O `db.json` continua sendo a base do `json-server` legado (`npm run api:server`, porta 3001). Recursos:
 
 | Recurso | Métodos | Uso |
 | --- | --- | --- |

@@ -39,8 +39,16 @@ export async function POST(request: Request) {
 
   const filename = `${Date.now()}-${randomUUID()}.${extension}`;
   const directory = path.join(process.cwd(), 'public', 'uploads');
-  await mkdir(directory, { recursive: true });
-  await writeFile(path.join(directory, filename), Buffer.from(await file.arrayBuffer()));
+  try {
+    await mkdir(directory, { recursive: true });
+    await writeFile(path.join(directory, filename), Buffer.from(await file.arrayBuffer()));
+  } catch (error) {
+    const code = error instanceof Error && 'code' in error ? String((error as NodeJS.ErrnoException).code) : '';
+    if (code === 'EROFS' || code === 'EACCES') {
+      return Response.json({ error: 'Upload indisponível neste ambiente.' }, { status: 503 });
+    }
+    throw error;
+  }
 
   return Response.json({ url: `/uploads/${filename}` });
 }

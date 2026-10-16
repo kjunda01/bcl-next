@@ -36,6 +36,10 @@ yarn-error.log*
 # vercel
 .vercel
 
+# capturas locais e sidecars de DLP
+.tmp-shots/
+*:sec.endpointdlp
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
