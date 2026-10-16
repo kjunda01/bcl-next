@@ -282,61 +282,41 @@
       "id": "media-4",
       "title": "3º Campeonato de Truco da Banda",
       "slug": "torneio-de-truco",
-      "excerpt": "No dia 11 de outubro, a sede da Banda Carmelitana Luminarense encheu de duplas, cartas e troféu. Veja como foi o 3º Campeonato de Truco.",
-      "body": "Domingo, 11 de outubro de 2026, a sede da Banda Carmelitana Luminarense virou mesa de jogo. A partir das 13h começou o 3º Campeonato de Truco, com duplas, premiação em dinheiro e troféus para quem ficou em primeiro, segundo e terceiro lugar.\nEntre uma mão e outra, o salão da banda ficou cheio: cartas na mesa, anotação de pontos e o bar com cerveja, refrigerante e petiscos, como o cartaz da porta anunciava.\nDuplas, a partir das 13h\nSede da banda, em Luminárias\nTroféu e premiação para as três primeiras duplas\n\nO convite na porta\nO cartaz em preto e branco deixava a regra clara: 3º campeonato de truco da Banda Carmelitana Luminarense. Truco, aqui, também é encontro de quem acompanha a banda dentro e fora do palco.\n\nBoi contra Dourado\nA arte do campeonato colocou o Boi e o Dourado frente a frente, com a lira da banda ao fundo. No letreiro, a frase que guiou a tarde: truco é respeito, parceria e tradição.\n\nOutra dupla ganhou desenho próprio: Botijão de Gás e Manga, de chapéu, copo na mesa e a sede da banda atrás. O humor dos cartazes entrou no clima das partidas.\n\nO salão lotado\nAs mesas vermelhas se espalharam pelo salão. Enquanto uma dupla puxava a mão, outra anotava o placar. No fundo, os troféus da banda e os instrumentos lembravam a casa de quem estava jogando.\n\nIntervalo de petisco\nO cartaz prometia petisco, e a promessa saiu da churrasqueira. Teve espetinho, pão e o bar da sede para atravessar a tarde sem levantar da cadeira por muito tempo.\n\nEm vídeo\nOs registros abaixo acompanham a ordem da tarde, da preparação das mesas à premiação.\n\nO troféu de campeão fechou o 3º Campeonato de Truco. Na próxima, a sede abre de novo: cartas na mesa e a banda por perto.",
-      "coverUrl": "/assets/blog/torneio-truco/cartaz-boi.jpeg",
-      "videoUrl": "/assets/blog/torneio-truco/video-01.mp4",
+      "excerpt": "No domingo, 11 de outubro, a sede lotou para o 3º Campeonato de Truco da Banda Carmelitana Luminarense. Veja os campeões, as fotos e os vídeos da tarde.",
+      "body": "No domingo, 11 de outubro, a sede da Banda Carmelitana Luminarense virou ponto de encontro. A partir das 13h rolou o 3º Campeonato de Truco: duplas, cartas na mesa, premiação em dinheiro e troféu para o primeiro, o vice e o terceiro lugar.\n\nTruco, aqui, também é festa da comunidade da banda. Quem passou a tarde no salão encontrou bar com cerveja e refrigerante, petisco na churrasqueira e o clima de parceria que o cartaz já anunciava na porta.\n\nO convite na porta\ndomingo, 11/10, a partir das 13h.\n\nO salão lotado\nAs mesas se espalharam pelo salão. Enquanto uma dupla trucava, outra revidava SEIS.\n\nIntervalo de petisco\nTeve espetinho, pão com linguiça e o bar da banda para atravessar a tarde.\n\nBoi contra Dourado: truco é tropa.\n\nA premiação\n1º lugar: Chico Bala e Pancinha\nVice: Valter e Odécio\n3º lugar: Japonês e Juninho\n\nEm vídeo\nOs registros abaixo mostram um pouco de como foi.\n\nQuem curtiu o campeonato, acompanha a banda: o próximo encontro pode ser no palco ou de novo na mesa. Fique de olho no blog e na sede.",
+      "coverUrl": "/assets/blog/torneio-truco/capa.jpeg",
+      "videoUrl": "",
       "kind": "article",
       "status": "published",
       "publishedAt": "2026-10-11T18:00:00.000Z",
       "createdAt": "2026-10-11T18:00:00.000Z",
-      "updatedAt": "2026-10-13T15:00:00.000Z",
+      "updatedAt": "2026-10-16T20:45:00.000Z",
       "blocks": [
         {
           "id": "block-1",
           "type": "text",
-          "text": "<p>Domingo, <strong>11 de outubro de 2026</strong>, a sede da Banda Carmelitana Luminarense virou mesa de jogo. A partir das 13h começou o <strong>3º Campeonato de Truco</strong>, com duplas, premiação em dinheiro e troféus para quem ficou em primeiro, segundo e terceiro lugar.</p><p>Entre uma mão e outra, o salão da banda ficou cheio: cartas na mesa, anotação de pontos e o bar com cerveja, refrigerante e petiscos, como o cartaz da porta anunciava.</p><ul><li>Duplas, a partir das 13h</li><li>Sede da banda, em Luminárias</li><li>Troféu e premiação para as três primeiras duplas</li></ul>"
+          "text": "<p>No domingo, <strong>11 de outubro</strong>, a sede da Banda Carmelitana Luminarense virou ponto de encontro. A partir das 13h rolou o <strong>3º Campeonato de Truco</strong>: duplas, cartas na mesa, premiação em dinheiro e troféu para o primeiro, o vice e o terceiro lugar.</p><p>Truco, aqui, também é festa da comunidade da banda. Quem passou a tarde no salão encontrou bar com cerveja e refrigerante, petisco na churrasqueira e o clima de parceria que o cartaz já anunciava na porta.</p>"
         },
         {
           "id": "block-2",
           "type": "section",
           "layout": "text-image",
-          "size": "medium",
+          "text": "<h2>O convite na porta</h2><p>O cartaz deixava a regra clara: <em>3º campeonato de truco da Banda Carmelitana Luminarense</em>. Valeu a pena chegar cedo: teve jogo, bar e petisco até a premiação.</p>",
           "src": "/assets/blog/torneio-truco/cartaz-sede.jpeg",
-          "alt": "Cartaz do 3º Campeonato de Truco colado na sede da banda",
-          "caption": "O cartaz na sede: domingo, 11/10, a partir das 13h.",
-          "text": "<h2>O convite na porta</h2><p>O cartaz em preto e branco deixava a regra clara: <em>3º campeonato de truco da Banda Carmelitana Luminarense</em>. Truco, aqui, também é encontro de quem acompanha a banda dentro e fora do palco.</p>"
+          "alt": "Cartaz do 3º Campeonato de Truco",
+          "caption": "domingo, 11/10, a partir das 13h.",
+          "size": "medium"
         },
         {
           "id": "block-3",
-          "type": "section",
-          "layout": "image-text",
-          "size": "large",
-          "src": "/assets/blog/torneio-truco/cartaz-boi.jpeg",
-          "alt": "Cartaz ilustrado Boi contra Dourado no campeonato de truco da banda",
-          "caption": "Boi contra Dourado: truco é tropa.",
-          "text": "<h2>Boi contra Dourado</h2><p>A arte do campeonato colocou o Boi e o Dourado frente a frente, com a lira da banda ao fundo. No letreiro, a frase que guiou a tarde: <strong>truco é respeito, parceria e tradição</strong>.</p>"
+          "type": "text",
+          "text": "<h2>O salão lotado</h2><p>As mesas se espalharam pelo salão. Enquanto uma dupla trucava, outra revidava SEIS.</p>"
         },
         {
           "id": "block-4",
-          "type": "section",
-          "layout": "stack-image",
-          "size": "large",
-          "src": "/assets/blog/torneio-truco/cartaz-dupla.jpeg",
-          "alt": "Cartaz da dupla Botijão de Gás contra Manga",
-          "caption": "Botijão de Gás contra Manga, em Luminárias.",
-          "text": "<p>Outra dupla ganhou desenho próprio: <strong>Botijão de Gás</strong> e <strong>Manga</strong>, de chapéu, copo na mesa e a sede da banda atrás. O humor dos cartazes entrou no clima das partidas.</p>"
-        },
-        {
-          "id": "block-5",
-          "type": "text",
-          "text": "<h2>O salão lotado</h2><p>As mesas vermelhas se espalharam pelo salão. Enquanto uma dupla puxava a mão, outra anotava o placar. No fundo, os troféus da banda e os instrumentos lembravam a casa de quem estava jogando.</p>"
-        },
-        {
-          "id": "block-6",
           "type": "album",
           "layout": "carousel",
-          "caption": "As mesas do 3º Campeonato de Truco, na sede da banda.",
+          "caption": "As mesas do 3º Campeonato de Truco, com alguns participantes.",
           "images": [
             {
               "src": "/assets/blog/torneio-truco/sala-mesas.jpeg",
@@ -356,141 +336,135 @@
           ]
         },
         {
-          "id": "block-7",
+          "id": "block-5",
           "type": "section",
           "layout": "stack-text",
-          "size": "medium",
+          "text": "<h2>Intervalo de petisco</h2><p>A promessa saiu da churrasqueira. Teve espetinho, pão e o bar da banda para atravessar a tarde sem levantar da cadeira por muito tempo.</p><p>Todos puderam saborear a mais deliciosa carne temperada e assada com muito carinho, além do pão com linguiça que foi um sucesso.</p>",
           "src": "/assets/blog/torneio-truco/espetinhos.jpeg",
           "alt": "Espetinhos servidos no intervalo do campeonato",
-          "caption": "Espetinho no intervalo.",
-          "text": "<h2>Intervalo de petisco</h2><p>O cartaz prometia petisco, e a promessa saiu da churrasqueira. Teve espetinho, pão e o bar da sede para atravessar a tarde sem levantar da cadeira por muito tempo.</p>"
+          "caption": "Espetinho durante o evento.",
+          "size": "medium"
+        },
+        {
+          "id": "block-6",
+          "type": "image",
+          "src": "/assets/blog/torneio-truco/lanche.jpeg",
+          "alt": "Pão e bebida em uma das mesas vermelhas",
+          "caption": "O apreciado pão com linguiça.",
+          "size": "small"
+        },
+        {
+          "id": "block-7",
+          "type": "image",
+          "src": "/assets/blog/torneio-truco/mesa.jpeg",
+          "alt": "Lata sobre a mesa antes das partidas",
+          "caption": "Cerveja tão gelada que foi uma pedrada só",
+          "size": "medium"
         },
         {
           "id": "block-8",
           "type": "image",
-          "size": "small",
-          "src": "/assets/blog/torneio-truco/lanche.jpeg",
-          "alt": "Pão e bebida em uma das mesas vermelhas",
-          "caption": "A mesa também serviu de lanche."
+          "src": "/assets/blog/torneio-truco/placar.jpeg",
+          "alt": "Placar digital de truco utilizado por algumas duplas",
+          "caption": "Nós e eles: o placar da mão, facilitou a marcação dos pontos das partidas.",
+          "size": "large"
         },
         {
           "id": "block-9",
           "type": "image",
-          "size": "medium",
-          "src": "/assets/blog/torneio-truco/mesa.jpeg",
-          "alt": "Lata sobre a mesa antes das partidas",
-          "caption": "O bar anunciado no cartaz, no meio das mesas."
+          "src": "/assets/blog/torneio-truco/boi-querendo-ganhar.jpeg",
+          "alt": "Boi com o troféu do torneio de truco",
+          "caption": "Boi contra Dourado: truco é tropa.",
+          "size": "medium"
         },
         {
           "id": "block-10",
-          "type": "image",
-          "size": "large",
-          "src": "/assets/blog/torneio-truco/placar.jpeg",
-          "alt": "Placar digital de truco com nós e eles",
-          "caption": "Nós e eles: o placar da mão, do truque ao zerar os pontos."
+          "type": "text",
+          "text": "<h2>Os campeões</h2><p>A premiação fechou o <strong>3º Campeonato de Truco</strong>. Parabéns a quem subiu no pódio — e a todo mundo que sentou na mesa.</p>"
         },
         {
           "id": "block-11",
-          "type": "album",
-          "layout": "gallery",
-          "caption": "Do cartaz ao troféu de campeão.",
-          "images": [
-            {
-              "src": "/assets/blog/torneio-truco/trofeu.jpeg",
-              "alt": "Campeão ergue o troféu do torneio de truco",
-              "size": "large"
-            },
-            {
-              "src": "/assets/blog/torneio-truco/campeao.jpeg",
-              "alt": "Troféu de campeão do torneio de truco",
-              "size": "medium"
-            },
-            {
-              "src": "/assets/blog/torneio-truco/cartaz-boi.jpeg",
-              "alt": "Ilustração Boi contra Dourado",
-              "size": "small"
-            }
-          ]
+          "type": "image",
+          "src": "/assets/blog/torneio-truco/1lugar.jpg",
+          "alt": "Campeões de 1º lugar com o troféu do torneio de truco",
+          "caption": "1º lugar: Chico Bala e Pancinha.",
+          "size": "large"
         },
         {
           "id": "block-12",
-          "type": "album",
-          "layout": "thumbnails",
-          "caption": "Detalhes da tarde: arte, comida e o salão.",
-          "images": [
-            {
-              "src": "/assets/blog/torneio-truco/cartaz-dupla.jpeg",
-              "alt": "Cartaz Botijão de Gás contra Manga",
-              "size": "medium"
-            },
-            {
-              "src": "/assets/blog/torneio-truco/espetinhos.jpeg",
-              "alt": "Espetinhos do intervalo",
-              "size": "medium"
-            },
-            {
-              "src": "/assets/blog/torneio-truco/sala-mesas.jpeg",
-              "alt": "Visão geral das mesas",
-              "size": "medium"
-            },
-            {
-              "src": "/assets/blog/torneio-truco/cartaz-sede.jpeg",
-              "alt": "Cartaz impresso do campeonato",
-              "size": "medium"
-            }
-          ]
+          "type": "image",
+          "src": "/assets/blog/torneio-truco/2lugar.jpg",
+          "alt": "Dupla vice-campeã do torneio de truco",
+          "caption": "Vice: Valter e Odécio.",
+          "size": "large"
         },
         {
           "id": "block-13",
-          "type": "text",
-          "text": "<h2>Em vídeo</h2><p>Os registros abaixo acompanham a ordem da tarde, da preparação das mesas à premiação.</p>"
+          "type": "image",
+          "src": "/assets/blog/torneio-truco/3lugar.jpg",
+          "alt": "Dupla em 3º lugar do torneio de truco",
+          "caption": "3º lugar: Japonês e Juninho.",
+          "size": "large"
         },
         {
           "id": "block-14",
-          "type": "video",
-          "youtubeId": "",
-          "src": "/assets/blog/torneio-truco/video-01.mp4",
-          "caption": "Preparação, no começo da tarde."
+          "type": "image",
+          "src": "/assets/blog/torneio-truco/trofeu.jpeg",
+          "alt": "Campeão ergue o troféu do torneio de truco",
+          "caption": "Do cartaz ao troféu de campeão.",
+          "size": "medium"
         },
         {
           "id": "block-15",
-          "type": "video",
-          "youtubeId": "",
-          "src": "/assets/blog/torneio-truco/video-02.mp4",
-          "caption": "As mesas começando a encher."
+          "type": "text",
+          "text": "<h2>Em vídeo</h2><p>Os registros abaixo mostram um pouco de como foi.</p>"
         },
         {
           "id": "block-16",
           "type": "video",
           "youtubeId": "",
-          "src": "/assets/blog/torneio-truco/video-03.mp4",
-          "caption": "Uma das mãos do campeonato."
+          "src": "/assets/blog/torneio-truco/video-01.mp4",
+          "caption": "Nosso grande amigo e excelente jogador, Farinha, vai ter sorte pra sair com cartas."
         },
         {
           "id": "block-17",
           "type": "video",
           "youtubeId": "",
-          "src": "/assets/blog/torneio-truco/video-04.mp4",
-          "caption": "A partida esquenta."
+          "src": "/assets/blog/torneio-truco/video-02.mp4",
+          "caption": "O grande Toninho da farmácia, um dos profissionais presentes."
         },
         {
           "id": "block-18",
           "type": "video",
           "youtubeId": "",
-          "src": "/assets/blog/torneio-truco/video-05.mp4",
-          "caption": "O salão no meio do torneio."
+          "src": "/assets/blog/torneio-truco/video-03.mp4",
+          "caption": "E mais gente chegando. Grande Adir, junto com seu parceiro Luizinho, a sorte não estava do lado deles."
         },
         {
           "id": "block-19",
           "type": "video",
           "youtubeId": "",
-          "src": "/assets/blog/torneio-truco/video-06.mp4",
-          "caption": "A premiação, no fim da tarde."
+          "src": "/assets/blog/torneio-truco/video-04.mp4",
+          "caption": "A amizade foi o destaque."
         },
         {
           "id": "block-20",
+          "type": "video",
+          "youtubeId": "",
+          "src": "/assets/blog/torneio-truco/video-05.mp4",
+          "caption": "O salão no início do torneio."
+        },
+        {
+          "id": "block-21",
+          "type": "video",
+          "youtubeId": "",
+          "src": "/assets/blog/torneio-truco/video-06.mp4",
+          "caption": "Uma pequena prévia do início da jogatina."
+        },
+        {
+          "id": "block-22",
           "type": "text",
-          "text": "<p>O troféu de campeão fechou o <strong>3º Campeonato de Truco</strong>. Na próxima, a sede abre de novo: cartas na mesa e a banda por perto.</p>"
+          "text": "<p>Gostou? A banda vive desses encontros. Acompanhe o blog, passe na sede e fica o convite: no próximo campeonato a cadeira é sua.</p>"
         }
       ]
     }
