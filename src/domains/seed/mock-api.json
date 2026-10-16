@@ -237,68 +237,7 @@
       "updatedAt": "2022-11-01T10:00:00.000Z"
     }
   ],
-  "presentations": [
-    {
-      "id": "pres-3",
-      "title": "Concerto de outubro na praça",
-      "venue": "Praça da Matriz, Luminárias",
-      "startsAt": "2026-10-25T22:00:00.000Z",
-      "description": "Repertório de marchas e hinos com participação da comunidade. Traga a família.",
-      "repertoireIds": [
-        "song-1",
-        "song-2"
-      ],
-      "coverUrl": "/imgs/img2.jpg",
-      "isPublic": true,
-      "status": "scheduled",
-      "createdAt": "2026-10-01T10:00:00.000Z",
-      "updatedAt": "2026-10-01T10:00:00.000Z"
-    },
-    {
-      "id": "pres-4",
-      "title": "Apresentação de fim de ano",
-      "venue": "Centro Cultural, Luminárias",
-      "startsAt": "2026-12-15T23:00:00.000Z",
-      "description": "Encerramento do ano com o repertório preparado pelos alunos e músicos.",
-      "repertoireIds": [
-        "song-1"
-      ],
-      "coverUrl": "/imgs/img3.jpg",
-      "isPublic": true,
-      "status": "scheduled",
-      "createdAt": "2026-10-05T10:00:00.000Z",
-      "updatedAt": "2026-10-05T10:00:00.000Z"
-    },
-    {
-      "id": "pres-1",
-      "title": "Concertos de setembro",
-      "venue": "Praça da Matriz, Luminárias",
-      "startsAt": "2026-09-20T19:00:00.000Z",
-      "description": "Apresentação ao ar livre com repertório tradicional.",
-      "repertoireIds": [
-        "song-1",
-        "song-2"
-      ],
-      "coverUrl": "/imgs/img1.jpg",
-      "isPublic": true,
-      "status": "done",
-      "createdAt": "2026-08-01T10:00:00.000Z",
-      "updatedAt": "2026-09-21T10:00:00.000Z"
-    },
-    {
-      "id": "pres-2",
-      "title": "Ensaio geral interno",
-      "venue": "Sede da banda",
-      "startsAt": "2026-09-18T20:00:00.000Z",
-      "repertoireIds": [
-        "song-1"
-      ],
-      "isPublic": false,
-      "status": "scheduled",
-      "createdAt": "2026-08-10T10:00:00.000Z",
-      "updatedAt": "2026-08-10T10:00:00.000Z"
-    }
-  ],
+  "presentations": [],
   "media": [
     {
       "id": "media-1",
