@@ -4,14 +4,18 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   useSyncExternalStore,
   type ReactNode,
 } from 'react';
-import { demoUserByRole, findDemoUser } from '@/core/auth/demoUsers';
+import { setAccessToken, getAccessToken, usesRemoteApi } from '@/core/auth/accessToken';
+import { DEMO_USERS, demoUserByRole, findDemoUser } from '@/core/auth/demoUsers';
+import { apiFetch } from '@/lib/api';
+import { sealPassword } from '@/lib/passwordCipher';
+import { UNDER_CONSTRUCTION_MESSAGE } from '@/lib/userMessages';
 import {
-  AUTHENTICATED_ROLES,
   PUBLIC_ROLES,
   type AccessRoles,
   type AuthenticatedRole,
@@ -21,15 +25,19 @@ import type { AppUser } from '@/domains/users/types';
 const AUTH_USER_KEY = 'app.auth.user';
 const AUTH_KEEP_LOGGED_KEY = 'app.auth.keepLoggedIn';
 
-export type SessionUser = AppUser;
+export type SessionUser = AppUser & { permissions?: string[] };
 
 type AuthContextValue = {
   user: SessionUser | null;
   isHydrated: boolean;
   isLoggedIn: boolean;
   roles: AccessRoles;
+  permissions: readonly string[] | null;
   displayName: string | null;
-  login: (email: string, password: string, keepLoggedIn: boolean) => Promise<void>;
+  /** `identifier` aceita nome de usuário ou e-mail. */
+  login: (identifier: string, password: string, keepLoggedIn: boolean) => Promise<SessionUser>;
+  /** `credential` é o ID token do Google Identity Services. Só com a API Spring. */
+  loginWithGoogle: (credential: string, keepLoggedIn: boolean) => Promise<SessionUser>;
   loginAs: (role: AuthenticatedRole, keepLoggedIn: boolean) => Promise<void>;
   logout: () => Promise<void>;
   updateProfile: (patch: Partial<SessionUser>) => void;
@@ -49,18 +57,22 @@ function persist(user: SessionUser | null, keepLoggedIn: boolean) {
   localStorage.removeItem(AUTH_USER_KEY);
 }
 
+type LoginPayload = {
+  token: string;
+  user: SessionUser;
+};
+
 function restoreUser(): SessionUser | null {
   if (typeof window === 'undefined') return null;
   const keep = localStorage.getItem(AUTH_KEEP_LOGGED_KEY) === 'true';
   if (!keep) return null;
+  if (usesRemoteApi() && !localStorage.getItem('app.auth.token')) return null;
   const stored = localStorage.getItem(AUTH_USER_KEY);
   if (!stored) return null;
   try {
     const parsed = JSON.parse(stored) as Partial<SessionUser>;
     const roles = Array.isArray(parsed.roles)
-      ? parsed.roles.filter((role): role is AuthenticatedRole =>
-          (AUTHENTICATED_ROLES as readonly string[]).includes(role),
-        )
+      ? parsed.roles.filter((role): role is string => typeof role === 'string' && /^[a-z][a-z0-9_]{1,31}$/.test(role))
       : [];
     if (roles.length === 0) return null;
     return { ...parsed, roles } as SessionUser;
@@ -78,27 +90,80 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     () => false,
   );
 
-  const login = useCallback(async (email: string, password: string, keepLoggedIn: boolean) => {
-    const found = findDemoUser(email, password);
+  const login = useCallback(async (identifier: string, password: string, keepLoggedIn: boolean) => {
+    if (usesRemoteApi()) {
+      // A senha nunca vai em claro: é cifrada com a chave pública da API.
+      const sealed = await sealPassword(password);
+      const session = await apiFetch<LoginPayload>('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ username: identifier.trim(), password: sealed, keepLoggedIn }),
+      });
+      setAccessToken(session.token, keepLoggedIn);
+      setUser(session.user);
+      persist(session.user, keepLoggedIn);
+      return session.user;
+    }
+    const found = findDemoUser(identifier, password);
     if (!found) {
-      throw new Error('E-mail ou senha inválidos.');
+      throw new Error('Usuário ou senha inválidos.');
     }
     setUser(found);
     persist(found, keepLoggedIn);
+    return found;
+  }, []);
+
+  const loginWithGoogle = useCallback(async (credential: string, keepLoggedIn: boolean) => {
+    if (!usesRemoteApi()) {
+      throw new Error(UNDER_CONSTRUCTION_MESSAGE);
+    }
+    const session = await apiFetch<LoginPayload>('/auth/google', {
+      method: 'POST',
+      body: JSON.stringify({ credential, keepLoggedIn }),
+    });
+    setAccessToken(session.token, keepLoggedIn);
+    setUser(session.user);
+    persist(session.user, keepLoggedIn);
+    return session.user;
   }, []);
 
   const loginAs = useCallback(async (role: AuthenticatedRole, keepLoggedIn: boolean) => {
     if (role === 'admin' || role === 'maestro') {
-      throw new Error('Administrador e maestro entram com e-mail e senha.');
+      throw new Error('Administrador e maestro entram com usuário e senha.');
+    }
+    if (usesRemoteApi()) {
+      const match = DEMO_USERS.find((user) => user.roles.includes(role));
+      if (!match) {
+        throw new Error(UNDER_CONSTRUCTION_MESSAGE);
+      }
+      await login(match.username, match.password, keepLoggedIn);
+      return;
     }
     const found = demoUserByRole(role);
     setUser(found);
     persist(found, keepLoggedIn);
-  }, []);
+  }, [login]);
 
   const logout = useCallback(async () => {
+    setAccessToken(null, false);
     setUser(null);
     persist(null, false);
+  }, []);
+
+  useEffect(() => {
+    if (!usesRemoteApi() || !getAccessToken()) return;
+    let active = true;
+    apiFetch<SessionUser>('/auth/me')
+      .then((me) => {
+        if (!active) return;
+        setUser(me);
+        if (localStorage.getItem(AUTH_KEEP_LOGGED_KEY) === 'true') {
+          localStorage.setItem(AUTH_USER_KEY, JSON.stringify(me));
+        }
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
   }, []);
 
   const updateProfile = useCallback((patch: Partial<SessionUser>) => {
@@ -120,14 +185,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isHydrated,
         isLoggedIn: hydratedUser !== null,
         roles: hydratedUser?.roles ?? PUBLIC_ROLES,
+        permissions: hydratedUser?.permissions ?? null,
         displayName: hydratedUser ? hydratedUser.name.split(' ')[0] : null,
         login,
+        loginWithGoogle,
         loginAs,
         logout,
         updateProfile,
       };
     },
-    [isHydrated, user, login, loginAs, logout, updateProfile],
+    [isHydrated, user, login, loginWithGoogle, loginAs, logout, updateProfile],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,14 +1,21 @@
-import type { AuthenticatedRole } from '@/core/auth/roles';
 import type { Auditable, EntityId } from '../shared';
 
+/**
+ * Conta de acesso. Todo usuário é uma pessoa: nome, e-mail, foto, telefone e
+ * endereço vêm do cadastro da pessoa (`personId`).
+ */
 export interface AppUser extends Auditable {
   id: EntityId;
-  email: string;
+  username: string;
+  email?: string | null;
   name: string;
-  roles: AuthenticatedRole[];
-  personId?: EntityId;
+  roles: string[];
+  personId: EntityId;
   isActive: boolean;
-  pictureUrl?: string;
-  phone?: string;
-  address?: string;
+  mustChangePassword?: boolean;
+  approvalStatus?: 'pending' | 'approved';
+  passwordResetRequested?: boolean;
+  pictureUrl?: string | null;
+  phone?: string | null;
+  address?: string | null;
 }

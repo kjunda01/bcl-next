@@ -8,8 +8,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { DOMAINS } from '@/domains/catalog';
 
 export default function GestaoPage() {
-  const { roles, displayName } = useAuth();
-  const nav = getManagementNav(roles).filter((item) => item.href !== '/gestao');
+  const { roles, permissions, displayName } = useAuth();
+  const nav = getManagementNav(roles, permissions).filter((item) => item.href !== '/gestao');
 
   return (
     <div className="mx-auto max-w-6xl space-y-8">
@@ -26,7 +26,7 @@ export default function GestaoPage() {
         {nav.map((item) => {
           const domain = DOMAINS.find((entry) => entry.path === item.href);
           const writable = domain
-            ? can(roles, domain.id, 'create') || can(roles, domain.id, 'update')
+            ? can(roles, domain.id, 'create', permissions) || can(roles, domain.id, 'update', permissions)
             : false;
           const isStudy = item.href === '/study';
           return (

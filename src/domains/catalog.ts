@@ -34,7 +34,7 @@ export const DOMAINS: DomainDefinition[] = [
   {
     id: 'users',
     label: 'Usuários',
-    description: 'Contas de acesso e permissionamento.',
+    description: 'Contas de acesso. O vínculo com papéis é feito pelo administrador.',
     path: '/gestao/usuarios',
     icon: 'manage_accounts',
     apiResource: 'users',

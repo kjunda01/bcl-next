@@ -11,7 +11,7 @@ import type { Presentation } from '@/domains/presentations/types';
 import { apiFetch } from '@/lib/api';
 
 export default function HomePage() {
-  const { isLoggedIn, isHydrated, roles } = useAuth();
+  const { isLoggedIn, isHydrated, roles, permissions } = useAuth();
   const [homepage, setHomepage] = useState<HomepageDocument>(defaultHomepage);
   const [events, setEvents] = useState<Presentation[]>([]);
   const [posts, setPosts] = useState<MediaPost[]>([]);
@@ -51,7 +51,7 @@ export default function HomePage() {
       posts={posts}
       portalError={portalError}
       isLoggedIn={isLoggedIn}
-      showEditorLink={isHydrated && can(roles, 'homepage', 'update')}
+      showEditorLink={isHydrated && can(roles, 'homepage', 'update', permissions)}
       postOrder={postOrder}
     />
   );

@@ -4,56 +4,66 @@ import type { AuthenticatedRole } from './roles';
 /** Senha provisória até existir login real. Só administrador e maestro. */
 const PRIVILEGED_PASSWORD = '#bcl.2026@';
 
+/**
+ * Contas de demonstração. Espelham `demo.sql` do backend: todo usuário é uma
+ * pessoa e entra com nome de usuário (ou e-mail da pessoa) e senha.
+ */
 export const DEMO_USERS: Array<AppUser & { password: string }> = [
   {
-    id: 'user-admin',
+    id: 1,
+    username: 'admin',
     email: 'admin@bcl.local',
     name: 'Ana Admin',
     roles: ['admin'],
+    personId: 1,
     isActive: true,
     password: PRIVILEGED_PASSWORD,
     createdAt: '2024-01-10T10:00:00.000Z',
     updatedAt: '2024-01-10T10:00:00.000Z',
   },
   {
-    id: 'user-maestro',
+    id: 2,
+    username: 'maestro',
     email: 'maestro@bcl.local',
     name: 'Marcos Maestro',
-    roles: ['maestro'],
-    personId: 'person-maestro',
+    roles: ['maestro', 'musico'],
+    personId: 2,
     isActive: true,
     password: PRIVILEGED_PASSWORD,
     createdAt: '2024-01-10T10:00:00.000Z',
     updatedAt: '2024-01-10T10:00:00.000Z',
   },
   {
-    id: 'user-musico',
-    email: 'musico@bcl.local',
+    id: 3,
+    username: 'musico',
+    email: 'helena.trompete@email.com',
     name: 'Helena Trompete',
     roles: ['musico'],
-    personId: 'person-helena',
+    personId: 3,
     isActive: true,
     password: 'musico',
     createdAt: '2024-02-01T10:00:00.000Z',
     updatedAt: '2024-02-01T10:00:00.000Z',
   },
   {
-    id: 'user-aluno',
-    email: 'aluno@bcl.local',
+    id: 4,
+    username: 'aluno',
+    email: 'pedro.clarineta@email.com',
     name: 'Pedro Clarineta',
     roles: ['aluno'],
-    personId: 'person-pedro',
+    personId: 4,
     isActive: true,
     password: 'aluno',
     createdAt: '2024-03-01T10:00:00.000Z',
     updatedAt: '2024-03-01T10:00:00.000Z',
   },
   {
-    id: 'user-ambos',
-    email: 'ambos@bcl.local',
+    id: 5,
+    username: 'ambos',
+    email: 'luisa.sax@email.com',
     name: 'Luísa Sax',
     roles: ['aluno', 'musico'],
-    personId: 'person-luisa',
+    personId: 6,
     isActive: true,
     password: 'ambos',
     createdAt: '2024-03-12T10:00:00.000Z',
@@ -67,9 +77,13 @@ function withoutPassword(user: AppUser & { password: string }): AppUser {
   return safeUser;
 }
 
-export function findDemoUser(email: string, secret: string): AppUser | null {
+/** Encontra pela senha e por nome de usuário ou e-mail (sem diferenciar maiúsculas). */
+export function findDemoUser(identifier: string, secret: string): AppUser | null {
+  const needle = identifier.trim().toLowerCase();
   const match = DEMO_USERS.find(
-    (user) => user.email.toLowerCase() === email.toLowerCase() && user.password === secret,
+    (user) =>
+      user.password === secret &&
+      (user.username.toLowerCase() === needle || (user.email ?? '').toLowerCase() === needle),
   );
   return match ? withoutPassword(match) : null;
 }

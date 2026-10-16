@@ -142,7 +142,11 @@ export function parseBlogPage(payload: unknown): BlogPageDocument {
   }
 
   const postOrder = Array.isArray(row.postOrder)
-    ? row.postOrder.flatMap((id) => (typeof id === 'string' && id.trim() ? [id] : []))
+    ? row.postOrder.flatMap((id) => {
+        if (typeof id === 'number' && Number.isFinite(id)) return [String(id)];
+        if (typeof id === 'string' && id.trim()) return [id.trim()];
+        return [];
+      })
     : defaults.postOrder;
 
   return {

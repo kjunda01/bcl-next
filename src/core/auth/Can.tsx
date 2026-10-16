@@ -12,8 +12,8 @@ interface CanProps {
 }
 
 export function Can({ resource, action = 'read', children, fallback = null }: CanProps) {
-  const { roles } = useAuth();
-  if (!can(roles, resource, action)) {
+  const { roles, permissions } = useAuth();
+  if (!can(roles, resource, action, permissions)) {
     return <>{fallback}</>;
   }
   return <>{children}</>;

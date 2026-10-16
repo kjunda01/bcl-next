@@ -18,7 +18,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const auth = useAuth();
   const { theme, setTheme } = useTheme();
-  const managementNav = getManagementNav(auth.roles);
+  const managementNav = getManagementNav(auth.roles, auth.permissions);
   const primaryNav = managementNav.slice(0, 4);
   const extraNav = managementNav.slice(4);
 
@@ -33,6 +33,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     mq.addEventListener('change', onMediaChange);
     return () => mq.removeEventListener('change', onMediaChange);
   }, []);
+
+  useEffect(() => {
+    if (!auth.isHydrated || !auth.isLoggedIn) return;
+    if (auth.user?.mustChangePassword && pathname !== '/alterar-senha') {
+      router.replace('/alterar-senha');
+    }
+  }, [auth.isHydrated, auth.isLoggedIn, auth.user?.mustChangePassword, pathname, router]);
 
   useEffect(() => {
     if (!moreOpen || desktop) return;

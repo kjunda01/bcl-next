@@ -310,11 +310,17 @@
     transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
   }
 
-  // Estados de input
+  // Estados de input — todos os tipos de campo com a mesma cara (borda fina, mesmo padding)
+  input:not([type]),
   input[type="text"],
   input[type="email"],
   input[type="password"],
   input[type="number"],
+  input[type="tel"],
+  input[type="date"],
+  input[type="time"],
+  input[type="url"],
+  input[type="search"],
   textarea,
   select {
     background-color: var(--input);
@@ -322,7 +328,14 @@
     border: 1px solid var(--border);
     border-radius: 0.375rem;
     padding: 0.5rem 0.75rem;
+    font: inherit;
+    line-height: 1.4;
     transition: all 0.2s ease;
+
+    &::placeholder {
+      color: var(--muted-foreground);
+      opacity: 1;
+    }
 
     &:hover {
       border-color: var(--muted);
@@ -339,6 +352,36 @@
       color: var(--muted-foreground);
       cursor: not-allowed;
       opacity: 0.5;
+    }
+  }
+
+  // iOS desenha sombra interna e altura própria em campos de texto/data; igualamos ao restante
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="tel"],
+  input[type="date"],
+  input[type="url"],
+  input[type="search"] {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  // Campo de data vazio: mostra o texto de ajuda igual a um placeholder (WebKit/Blink)
+  input[type="date"] {
+    min-width: 0;
+
+    &::-webkit-date-and-time-value {
+      text-align: left;
+    }
+
+    &::-webkit-calendar-picker-indicator {
+      cursor: pointer;
+      opacity: 0.7;
+    }
+
+    &[data-empty="true"]:not(:focus) {
+      color: var(--muted-foreground);
     }
   }
 }

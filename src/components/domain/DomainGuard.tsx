@@ -14,9 +14,9 @@ interface DomainGuardProps {
 }
 
 export function DomainGuard({ resource, action = 'read', children }: DomainGuardProps) {
-  const { roles } = useAuth();
+  const { roles, permissions } = useAuth();
   const router = useRouter();
-  const allowed = can(roles, resource, action);
+  const allowed = can(roles, resource, action, permissions);
 
   useEffect(() => {
     if (!allowed) {

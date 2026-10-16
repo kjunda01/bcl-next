@@ -1,12 +1,4 @@
-const SENSITIVE_PERSON_KEYS = [
-  'email',
-  'phone',
-  'address',
-  'birthDate',
-  'guardianName',
-  'guardianPhone',
-  'document',
-] as const;
+const SENSITIVE_PERSON_KEYS = ['email', 'phone', 'address', 'birthDate', 'guardianName'] as const;
 
 export type SensitivePersonKey = (typeof SENSITIVE_PERSON_KEYS)[number];
 
