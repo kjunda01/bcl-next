@@ -8,11 +8,21 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 Frontend Next.js 16 / React 19 da Banda Carmelitana Luminarense: portal público, gestão interna e modo de estudo. Idioma da interface: **pt-BR**.
 
-Leia este arquivo antes de alterar código. Complementos: `README.md` e `docs/arquitetura-backend.md`.
+Leia este arquivo antes de alterar código. Complementos: `README.md`, `docs/arquitetura-backend.md` e, para história da banda, `docs/historia-banda.md`.
+
+## História da banda (fonte da verdade)
+
+A memória institucional da Banda Carmelitana Luminarense **não se inventa** e **não se completa** com texto de turismo, Wikipedia ou conhecimento geral do modelo.
+
+1. **Fonte primária:** `src/assets/A PRESENÇA DA MÚSICA NA HISTÓRIA LUMINARENSE (2023).pdf` — Hugo Nicodemos Biavati, *A Presença da Música na História Luminarense (1894 a 1978)*.
+2. **Base de conhecimento para agentes:** `docs/historia-banda.md` (síntese obrigatória desse PDF). Trate o que está ali como **verdade**. Em conflito com a página Sobre, seeds, copy antiga ou sites externos, **prevalece o livro**.
+3. O volume cobre **1894–1978**. Fatos posteriores só entram se já estiverem no produto (contato, CNPJ, sede atual) ou se o próprio livro os registrar (ex.: mortes de Sinhô e Nem, reformas da sede).
+4. Ao escrever ou alterar Sobre, home, blog, legendas, textos de seed ou qualquer menção histórica: ler `docs/historia-banda.md` **antes**. Não usar a narrativa de “músicos solitários nas montanhas” nem a data **1910** como fundação da associação — o livro funda a corporação em **1894** (Américo José da Costa) e o primeiro estatuto em **1912**.
+5. Distinguir sempre as três corporações: BCL (1894, a que permanece), Banda dos Vitorinos / Crioulos do Mata-Boi, e Euterpe Aparecida (1925).
 
 ## Produto
 
-- Visitante: Início, Agenda, Blog, Sobre. Sem login.
+- Visitante: Início, Agenda, Blog, Sobre, História. Sem login.
 - Após login: `/gestao` e módulos permitidos pelo perfil.
 - `/study`: treino com partitura (OSMD) e MIDI. Só músicas com MusicXML. Modal escolhe instrumentos **visíveis** e instrumentos **do áudio**, de forma independente.
 

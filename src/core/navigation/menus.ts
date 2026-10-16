@@ -14,6 +14,7 @@ export const PUBLIC_NAV: NavItem[] = [
   { href: '/agenda', label: 'Agenda', icon: 'event' },
   { href: '/blog', label: 'Blog', icon: 'article' },
   { href: '/sobre', label: 'Sobre', icon: 'info' },
+  { href: '/historia', label: 'História', icon: 'auto_stories' },
 ];
 
 const MANAGEMENT_NAV_SOURCE: Array<NavItem & { resource: Resource; action?: Action }> = [
@@ -28,7 +29,7 @@ const MANAGEMENT_NAV_SOURCE: Array<NavItem & { resource: Resource; action?: Acti
   })),
 ];
 
-export function getManagementNav(roles: AccessRoles): NavItem[] {
+export function getManagementNav(roles: AccessRoles, _permissions?: readonly string[] | null): NavItem[] {
   return MANAGEMENT_NAV_SOURCE.filter((item) => can(roles, item.resource, item.action ?? 'read')).map(
     ({ href, label, icon }) => ({ href, label, icon }),
   );

@@ -7,6 +7,8 @@
   color-scheme: light;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-display: var(--font-sans);
+  /* Títulos editoriais. A página que usa carrega a webfont e a põe na frente desta pilha. */
+  --font-serif: "Iowan Old Style", Georgia, "Times New Roman", serif;
   --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 
   --font-size-base: 16px;
