@@ -28,7 +28,11 @@ export function BlogPostCard({ post, featured = false }: BlogPostCardProps) {
               priority
             />
           </div>
-        ) : null}
+        ) : (
+          <div className="relative flex min-h-[220px] items-center justify-center bg-[var(--accent)] text-[var(--color-brand-strong)] md:min-h-full" aria-hidden>
+            <span className="material-icons text-6xl">article</span>
+          </div>
+        )}
         <div className="flex flex-col justify-center p-6 md:p-8">
           <p className="text-xs font-medium uppercase tracking-wide text-[var(--color-brand-strong)]">
             {mediaKindLabel(post.kind)}
