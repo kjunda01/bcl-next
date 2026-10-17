@@ -52,7 +52,7 @@ next-env.d.ts
 # SKILLS ESPECÍFICAS
 .agents/*
 skills-lock.json
-.impeccable
+.impeccable/
 
 # PASTA DE PROTÓTIPOS DE DESIGN
 src/app/prototype
