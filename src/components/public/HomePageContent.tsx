@@ -83,6 +83,9 @@ function HomeSectionBlock({
   postOrder: string[];
 }) {
   if (section.type === 'hero') {
+    const agendaIndex = section.links.findIndex((link) => link.href === '/agenda');
+    const primaryIndex = agendaIndex >= 0 ? agendaIndex : 0;
+
     return (
       <section id="portal-home-hero" className="portal-home-hero relative mb-10 overflow-hidden rounded-2xl md:mb-14">
         <div className="absolute inset-0">
@@ -102,18 +105,16 @@ function HomeSectionBlock({
             {section.title}
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-white/90 md:text-lg">{section.subtitle}</p>
-          <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+          <div className="mt-8 flex flex-col items-stretch justify-center gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
             {section.links.map((link, index) =>
               link.label.trim() ? (
                 <Link
                   key={link.href}
                   href={link.href}
                   className={
-                    index === 0
+                    index === primaryIndex
                       ? 'btn-primary inline-flex min-h-11 items-center justify-center gap-2 px-6'
-                      : index === 1
-                        ? 'btn-outline-primary inline-flex min-h-11 items-center justify-center gap-2 border-white/40 bg-white/10 px-6 text-white hover:bg-white/20'
-                        : 'inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius)] px-6 text-sm font-medium text-white/95 no-underline hover:bg-white/10'
+                      : 'inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius)] px-4 text-sm font-medium text-white underline decoration-white/60 underline-offset-4 hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-brand)]'
                   }
                 >
                   <span className="material-icons text-lg" aria-hidden>
