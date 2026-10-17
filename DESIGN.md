@@ -106,6 +106,7 @@ A paleta usa um acento ciano, navy para estrutura e texto, e neutros azulados pa
 - **Cinza secundário** (`#e8eef3`): controles e áreas secundárias.
 - **Vermelho destrutivo** (`#dc2626`): ações destrutivas e seus estados associados.
 - **Fundo noturno** (`#07131e`), **ciano noturno** (`#2ad4de`), **cartão noturno** (`#0f2233`) e **borda noturna** (`#1c354a`): equivalentes estruturais usados no tema escuro.
+- **Home:** texto de ação em ciano escurecido no tema claro (`#007781`) e ciano luminoso no tema escuro (`#2ad4de`). O CTA compartilha a superfície de cartão e as cores semânticas de texto do bloco do blog nos dois temas.
 - **Canvas da partitura** (`#eef3f7`): área de trabalho clara do estudo, independente do tema da interface.
 
 **The Token Source Rule.** Cores de interface devem vir dos tokens de `src/core/theme/tokens.css`; preservar a exceção explícita da partitura, que mantém o papel claro nos dois temas.
